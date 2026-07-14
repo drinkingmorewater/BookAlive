@@ -17,9 +17,6 @@
 
 我们不搞晦涩的国学讲座，不做冷冰冰的古籍检索，而是让你像跟一位千年笔友聊天一样——说出你的困惑，收到一封来自古人的温暖回信。有出处、有温度、有智慧，还有让人会心一笑的「今日小事」行动建议。
 
-点击访问介绍视频高清版：https://drive.google.com/file/d/1StpZOBG_yWj8lwW8WavGVVH7a0JrgVsB/view?usp=sharing
-直接观看：https://github.com/drinkingmorewater/BookAlive/issues/1
-
 ---
 
 ## 🎬 产品介绍视频
@@ -29,6 +26,8 @@ https://github.com/user-attachments/assets/72439ad7-e0e2-47ba-be96-7794ba36ca2e
 > 📺 **高清版备用链接**：[点击访问 Google Drive 高清视频](https://drive.google.com/file/d/1StpZOBG_yWj8lwW8WavGVVH7a0JrgVsB/view?usp=sharing)
 > 
 > 💡 若上方视频无法播放，可前往 [GitHub Issue #1](https://github.com/drinkingmorewater/BookAlive/issues/1) 直接观看，或使用 Google Drive 高清备用链接。
+
+---
 
 ## 🎯 市场定位：传统文化界的「斜杠青年」
 
