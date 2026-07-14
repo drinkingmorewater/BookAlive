@@ -1,0 +1,2331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦书来 - 一笺问古，千年回音</title>
+    <style>
+        :root {
+            --color-ink: #2C3E50;
+            --color-moss: #2D5A4A;
+            --color-ink-blue: #1E3A5F;
+            --color-paper: #F5F0E8;
+            --color-moon: #E8EEF4;
+            --color-gold: #C9A86C;
+            --color-bamboo: #5D7A5E;
+            --font-family: "Noto Serif SC", "Source Han Serif CN", serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-paper);
+            color: var(--color-ink);
+            line-height: 1.8;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(ellipse at 20% 80%, rgba(45, 90, 74, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(30, 58, 95, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(245, 240, 232, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(45, 90, 74, 0.1);
+            padding: 10px 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-ink);
+            font-size: 12px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--color-moss);
+            background: rgba(45, 90, 74, 0.05);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-text {
+            font-weight: 500;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+            padding-bottom: 80px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--color-ink-blue);
+            margin-bottom: 8px;
+            letter-spacing: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--color-bamboo);
+            letter-spacing: 4px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(45, 90, 74, 0.08);
+            border: 1px solid rgba(45, 90, 74, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(45, 90, 74, 0.12);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-moss);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-moss), var(--color-ink-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 90, 74, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-moss);
+            border: 1px solid var(--color-moss);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(45, 90, 74, 0.05);
+        }
+
+        .input-area {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid rgba(45, 90, 74, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: var(--font-family);
+            background: rgba(255, 255, 255, 0.5);
+            resize: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: var(--color-moss);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--color-bamboo);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(45, 90, 74, 0.2);
+            border-top-color: var(--color-moss);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .ink-spread {
+            animation: inkSpread 2s ease-out forwards;
+        }
+
+        @keyframes inkSpread {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .book-open {
+            animation: bookOpen 0.6s ease-out forwards;
+        }
+
+        @keyframes bookOpen {
+            0% { transform: rotateY(-90deg); opacity: 0; }
+            100% { transform: rotateY(0); opacity: 1; }
+        }
+
+        .water-wave {
+            animation: waterWave 2s ease-in-out infinite;
+        }
+
+        @keyframes waterWave {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .breathing-circle {
+            animation: breathing 3s ease-in-out infinite;
+        }
+
+        @keyframes breathing {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 0.3; }
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(45, 90, 74, 0.1);
+            color: var(--color-moss);
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--color-moss);
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .flex {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-ink-blue);
+            margin-bottom: 16px;
+            padding-left: 8px;
+            border-left: 3px solid var(--color-moss);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .font-serif {
+            font-family: var(--font-family);
+        }
+
+        .font-italic {
+            font-style: italic;
+        }
+
+        .text-muted {
+            color: var(--color-bamboo);
+        }
+
+        .text-gold {
+            color: var(--color-gold);
+        }
+
+        .bg-paper {
+            background: var(--color-paper);
+        }
+
+        .bg-moon {
+            background: var(--color-moon);
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(45, 90, 74, 0.1);
+            margin: 20px 0;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #8B9A8F;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(232, 238, 244, 0.5);
+            border-radius: 8px;
+        }
+
+        .scroll-unfold {
+            animation: scrollUnfold 1.5s ease-out forwards;
+            overflow: hidden;
+        }
+
+        @keyframes scrollUnfold {
+            0% {
+                max-height: 0;
+                opacity: 0;
+            }
+            100% {
+                max-height: 2000px;
+                opacity: 1;
+            }
+        }
+
+        .letter-paper {
+            background: linear-gradient(135deg, #FDFBF7 0%, #F5F0E8 100%);
+            background-image: 
+                repeating-linear-gradient(
+                    transparent 0px,
+                    transparent 27px,
+                    rgba(45, 90, 74, 0.05) 28px
+                );
+            border: 1px solid rgba(201, 168, 108, 0.3);
+            box-shadow: 
+                0 1px 3px rgba(0,0,0,0.1),
+                inset 0 0 60px rgba(201, 168, 108, 0.05);
+        }
+
+        .letter-scroll {
+            position: relative;
+            padding: 30px;
+            border-radius: 4px;
+        }
+
+        .letter-scroll::before,
+        .letter-scroll::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 20px;
+            background: linear-gradient(90deg, transparent, #8B7355, #8B7355, transparent);
+            border-radius: 4px;
+        }
+
+        .letter-scroll::before {
+            top: -10px;
+        }
+
+        .letter-scroll::after {
+            bottom: -10px;
+        }
+
+        .font-song {
+            font-family: "Noto Serif SC", "Source Han Serif CN", "SimSun", serif;
+        }
+
+        .font-kai {
+            font-family: "KaiTi", "STKaiti", "KaiTi_GB2312", serif;
+        }
+
+        .font-regular {
+            font-size: 15px;
+        }
+
+        .font-large {
+            font-size: 18px;
+        }
+
+        .bg-paper {
+            background: linear-gradient(135deg, #FDFBF7 0%, #F5F0E8 100%);
+        }
+
+        .bg-parchment {
+            background: linear-gradient(135deg, #F4E4BC 0%, #E8D4A8 100%);
+        }
+
+        .bg-silk {
+            background: linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%);
+        }
+
+        .bg-bamboo {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+        }
+
+        .personalize-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 12px;
+            background: rgba(232, 238, 244, 0.5);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .personalize-btn {
+            padding: 6px 12px;
+            border: 1px solid rgba(45, 90, 74, 0.2);
+            border-radius: 4px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .personalize-btn:hover {
+            background: rgba(45, 90, 74, 0.1);
+            border-color: var(--color-moss);
+        }
+
+        .personalize-btn.active {
+            background: var(--color-moss);
+            color: white;
+            border-color: var(--color-moss);
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid rgba(45, 90, 74, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            border-radius: 4px 4px 0 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--color-bamboo);
+        }
+
+        .category-tab.active {
+            background: rgba(45, 90, 74, 0.1);
+            color: var(--color-moss);
+            font-weight: 600;
+        }
+
+        .letter-author {
+            text-align: right;
+            font-size: 14px;
+            color: var(--color-bamboo);
+            margin-top: 16px;
+            padding-right: 20px;
+        }
+
+        .letter-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-ink-blue);
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .navbar {
+                top: 0;
+                bottom: auto;
+                border-top: none;
+                border-bottom: 1px solid rgba(45, 90, 74, 0.1);
+            }
+
+            .page {
+                padding-top: 80px;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+
+            .title {
+                font-size: 48px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#page-home" class="nav-item active" onclick="switchPage('home')">
+            <span class="nav-icon">🏮</span>
+            <span class="nav-text">锦书堂</span>
+        </a>
+        <a href="#page-ask" class="nav-item" onclick="switchPage('ask')">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">问古笺</span>
+        </a>
+        <a href="#page-today" class="nav-item" onclick="switchPage('today')">
+            <span class="nav-icon">📅</span>
+            <span class="nav-text">今朝录</span>
+        </a>
+        <a href="#page-dream" class="nav-item" onclick="switchPage('dream')">
+            <span class="nav-icon">🌙</span>
+            <span class="nav-text">梦华笺</span>
+        </a>
+        <a href="#page-collection" class="nav-item" onclick="switchPage('collection')">
+            <span class="nav-icon">📚</span>
+            <span class="nav-text">藏笺阁</span>
+        </a>
+    </nav>
+
+    <div id="page-home" class="page active">
+        <div class="header">
+            <h1 class="title">锦书来</h1>
+            <p class="subtitle">一笺问古，千年回音</p>
+            <p style="margin-top: 20px; color: var(--color-bamboo); font-size: 16px;">把今日心事，写成一封寄往千年的锦书。</p>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 30px;">
+            <textarea id="home-input" class="input-area" rows="3" placeholder="此刻，你最想说些什么？"></textarea>
+            <div style="margin-top: 20px;" class="flex" style="justify-content: center;">
+                <button class="btn btn-primary" onclick="goToPage('ask')">写一封问古笺</button>
+                <button class="btn btn-secondary" onclick="goToPage('today')">领取今朝心签</button>
+                <button class="btn btn-secondary" onclick="playMusic('chinese-guzheng')">听一剂今日音方</button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card" onclick="goToPage('ask')">
+                <h3 class="card-title">📜 问古笺</h3>
+                <p class="text-muted">写下现实困惑，从古籍中收到一封有出处、有解释的回信。</p>
+            </div>
+            <div class="card" onclick="goToPage('today')">
+                <h3 class="card-title">📅 今朝录</h3>
+                <p class="text-muted">查看今日黄历、记录心境、抽取心签，领取今天的行动提示。</p>
+            </div>
+            <div class="card" onclick="goToPage('dream')">
+                <h3 class="card-title">🌙 梦华笺</h3>
+                <p class="text-muted">拾取梦中的意象，在传统文化与现代自我观察之间理解梦境。</p>
+            </div>
+            <div class="card" onclick="goToPage('collection')">
+                <h3 class="card-title">📚 藏笺阁</h3>
+                <p class="text-muted">收藏喜欢的回信、音方、签文和文化内容，形成个人文化画像。</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h2 class="section-title">清谈集</h2>
+            <div id="qingtan-list">
+            </div>
+        </div>
+    </div>
+
+    <div id="page-ask" class="page">
+        <div class="header">
+            <h1 class="title">问古笺</h1>
+            <p class="subtitle">与古人对话，寻心灵答案</p>
+        </div>
+
+        <div class="card">
+            <textarea id="ask-input" class="input-area" rows="4" placeholder="写下你的困惑，让古人来回答..."></textarea>
+            <div style="margin-top: 16px;" class="flex">
+                <button class="btn btn-primary" onclick="generateAnswer()">请古人回信</button>
+                <button class="btn btn-secondary" onclick="fillSampleQuestion()">示例问题</button>
+            </div>
+            <div id="ask-loading" class="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>正在翻阅古籍……</p>
+            </div>
+        </div>
+
+        <div id="ask-result" style="display: none;">
+            <div class="card book-open">
+                <h3 class="card-title">📝 你的问题</h3>
+                <p id="ask-question" style="font-size: 16px; line-height: 1.8;"></p>
+            </div>
+
+            <div class="card book-open" style="animation-delay: 0.1s;">
+                <h3 class="card-title">📖 书信往还</h3>
+                <div id="ask-action" style="font-size: 15px; line-height: 1.8;"></div>
+            </div>
+
+            <div class="card book-open" style="animation-delay: 0.15s;">
+                <h3 class="card-title">🎯 今日小事</h3>
+                <div id="ask-advice" style="font-size: 15px; line-height: 1.8;"></div>
+            </div>
+
+            <div class="card book-open" style="animation-delay: 0.2s;">
+                <h3 class="card-title">📖 古籍原文</h3>
+                <div style="background: rgba(232, 238, 244, 0.5); padding: 20px; border-radius: 8px; text-align: center;">
+                    <p id="ask-quote" style="font-size: 18px; font-weight: 600; color: var(--color-ink-blue);"></p>
+                    <p id="ask-source" style="margin-top: 12px; font-size: 14px; color: var(--color-bamboo);"></p>
+                </div>
+                <div style="margin-top: 16px;">
+                    <h4 style="font-size: 14px; color: var(--color-moss); margin-bottom: 8px;">白话解释</h4>
+                    <p id="ask-explain" style="font-size: 15px; line-height: 1.8;"></p>
+                </div>
+                <div style="margin-top: 16px;">
+                    <h4 style="font-size: 14px; color: var(--color-moss); margin-bottom: 8px;">与现实的联系</h4>
+                    <p id="ask-connection" style="font-size: 15px; line-height: 1.8;"></p>
+                </div>
+            </div>
+
+            <div class="card book-open" style="animation-delay: 0.3s;">
+                <h3 class="card-title">💌 古人回信</h3>
+                <div id="ask-reply" class="letter-scroll letter-paper font-song font-regular bg-paper scroll-unfold" style="padding: 30px;"></div>
+            </div>
+
+            <div class="card book-open" style="animation-delay: 0.4s;">
+                <h3 class="card-title">🎵 推荐音方</h3>
+                <div id="ask-music"></div>
+            </div>
+
+            <div class="flex" style="justify-content: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="saveToCollection('ask')">珍藏此笺</button>
+                <button class="btn btn-secondary" onclick="shareCard()">分享锦书</button>
+                <button class="btn btn-primary" onclick="generateAnswer()">再问一次</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-today" class="page">
+        <div class="header">
+            <h1 class="title">今朝录</h1>
+            <p class="subtitle">记录今日，聆听时光</p>
+        </div>
+
+        <div class="section-title">1. 朝夕心境</div>
+        <div class="card">
+            <p style="margin-bottom: 16px; color: var(--color-bamboo);">选择今天的状态：</p>
+            <div class="flex">
+                <span class="tag" onclick="selectMood('心静')">心静</span>
+                <span class="tag" onclick="selectMood('疲惫')">疲惫</span>
+                <span class="tag" onclick="selectMood('焦虑')">焦虑</span>
+                <span class="tag" onclick="selectMood('犹疑')">犹疑</span>
+                <span class="tag" onclick="selectMood('期待')">期待</span>
+                <span class="tag" onclick="selectMood('孤独')">孤独</span>
+                <span class="tag" onclick="selectMood('振奋')">振奋</span>
+            </div>
+            <div id="mood-loading" class="loading" style="display: none; margin-top: 20px;">
+                <div class="loading-spinner"></div>
+                <p>正在辨认今朝心绪……</p>
+            </div>
+            <div id="mood-result" style="display: none; margin-top: 20px;"></div>
+        </div>
+
+        <div class="section-title">2. 岁时历</div>
+        <div class="card" id="calendar-card">
+            <h3 class="card-title">📅 今日黄历</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <p style="font-size: 14px; color: var(--color-bamboo);">公历日期</p>
+                    <p id="cal-gregorian" style="font-size: 18px; font-weight: 600;"></p>
+                </div>
+                <div>
+                    <p style="font-size: 14px; color: var(--color-bamboo);">农历日期</p>
+                    <p id="cal-lunar" style="font-size: 18px; font-weight: 600;"></p>
+                </div>
+                <div>
+                    <p style="font-size: 14px; color: var(--color-bamboo);">当前节气</p>
+                    <p id="cal-solar" style="font-size: 18px; font-weight: 600; color: var(--color-moss);"></p>
+                </div>
+                <div>
+                    <p style="font-size: 14px; color: var(--color-bamboo);">今日吉时</p>
+                    <p id="cal-lucky" style="font-size: 18px; font-weight: 600;"></p>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-moss); margin-bottom: 8px;">今日宜</p>
+                <p id="cal-yi" style="font-size: 16px;"></p>
+            </div>
+            <div>
+                <p style="font-size: 14px; color: #C75B5B; margin-bottom: 8px;">今日忌</p>
+                <p id="cal-ji" style="font-size: 16px;"></p>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo);">今日关键词</p>
+                <p id="cal-keyword" style="font-size: 24px; font-weight: 700; color: var(--color-ink-blue);"></p>
+            </div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo);">今日意象</p>
+                <p id="cal-image" style="font-size: 18px; color: var(--color-gold);"></p>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo);">今日文化小知识</p>
+                <p id="cal-tip" style="font-size: 15px; line-height: 1.8;"></p>
+            </div>
+        </div>
+
+        <div class="section-title">3. 灵签一引</div>
+        <div class="card">
+            <p style="margin-bottom: 16px; color: var(--color-bamboo);">选择求签主题：</p>
+            <div class="flex">
+                <span class="tag" onclick="selectLotTheme('学业')">学业</span>
+                <span class="tag" onclick="selectLotTheme('事业')">事业</span>
+                <span class="tag" onclick="selectLotTheme('人际')">人际</span>
+                <span class="tag" onclick="selectLotTheme('心情')">心情</span>
+                <span class="tag" onclick="selectLotTheme('随心')">随心一问</span>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="drawLot()">静心抽一签</button>
+            <div id="lot-loading" class="loading" style="display: none; margin-top: 20px;">
+                <div class="loading-spinner"></div>
+                <p>正在摇动签筒……</p>
+            </div>
+            <div id="lot-result" style="display: none; margin-top: 20px;"></div>
+            <p class="note">签文仅作为传统文化互动与自我反思参考。</p>
+        </div>
+
+        <div class="section-title">4. 弦上方</div>
+        <div class="card">
+            <p style="font-size: 16px; color: var(--color-moss); margin-bottom: 16px;">听一曲古音，为今日心绪开一剂方。</p>
+            <div class="flex">
+                <span class="tag" onclick="selectMusicTheme('安神')">安神</span>
+                <span class="tag" onclick="selectMusicTheme('入梦')">入梦</span>
+                <span class="tag" onclick="selectMusicTheme('专注')">专注</span>
+                <span class="tag" onclick="selectMusicTheme('清心')">清心</span>
+                <span class="tag" onclick="selectMusicTheme('振志')">振志</span>
+            </div>
+            <div id="music-loading" class="loading" style="display: none; margin-top: 20px;">
+                <div class="loading-spinner"></div>
+                <p>正在调配弦上音方……</p>
+            </div>
+            <div id="music-result" style="display: none; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="page-dream" class="page">
+        <div class="header">
+            <h1 class="title">梦华笺</h1>
+            <p class="subtitle">解读梦境，映照内心</p>
+        </div>
+
+        <div class="card">
+            <textarea id="dream-input" class="input-area" rows="4" placeholder="描述你的梦境，或选择下方标签..."></textarea>
+            <div style="margin-top: 16px;">
+                <p style="color: var(--color-bamboo); margin-bottom: 8px;">常见梦境标签：</p>
+                <div class="flex">
+                    <span class="tag" onclick="addDreamTag('大海')">大海</span>
+                    <span class="tag" onclick="addDreamTag('飞行')">飞行</span>
+                    <span class="tag" onclick="addDreamTag('故人')">故人</span>
+                    <span class="tag" onclick="addDreamTag('考试')">考试</span>
+                    <span class="tag" onclick="addDreamTag('迷路')">迷路</span>
+                    <span class="tag" onclick="addDreamTag('房屋')">房屋</span>
+                    <span class="tag" onclick="addDreamTag('动物')">动物</span>
+                    <span class="tag" onclick="addDreamTag('下雨')">下雨</span>
+                    <span class="tag" onclick="addDreamTag('重逢')">重逢</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="generateDream()">解一纸梦笺</button>
+            <div id="dream-loading" class="loading" style="display: none; margin-top: 20px;">
+                <div class="loading-spinner"></div>
+                <p>正在拾取梦中意象……</p>
+            </div>
+        </div>
+
+        <div id="dream-result" style="display: none;"></div>
+        <p class="note">梦境解读仅作为传统文化体验和自我观察参考，不构成现实预测或心理诊断。</p>
+    </div>
+
+    <div id="page-collection" class="page">
+        <div class="header">
+            <h1 class="title">藏笺阁</h1>
+            <p class="subtitle">珍藏你的文化印记</p>
+        </div>
+
+        <div class="section-title">1. 我的名帖</div>
+        <div class="card">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--color-moss); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">
+                    <span id="user-avatar">文</span>
+                </div>
+                <div>
+                    <input type="text" id="user-name" class="input-area" style="padding: 8px 12px; font-size: 16px; margin-bottom: 8px;" placeholder="昵称" onchange="saveUserInfo()">
+                    <input type="text" id="user-signature" class="input-area" style="padding: 8px 12px; font-size: 14px;" placeholder="个性签名" onchange="saveUserInfo()">
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo); margin-bottom: 8px;">当前心境</p>
+                <div class="flex">
+                    <span class="tag" id="user-mood" onclick="changeUserMood()"></span>
+                </div>
+            </div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo); margin-bottom: 8px; margin-top: 12px;">喜欢的古籍</p>
+                <div class="flex" id="user-books"></div>
+            </div>
+            <div>
+                <p style="font-size: 14px; color: var(--color-bamboo); margin-bottom: 8px; margin-top: 12px;">偏好的古乐器</p>
+                <div class="flex" id="user-instruments"></div>
+            </div>
+        </div>
+
+        <div class="section-title">2. 我的珍藏</div>
+        <div class="card">
+            <div class="flex" style="margin-bottom: 16px;">
+                <button class="btn btn-secondary" onclick="filterCollection('all')">全部</button>
+                <button class="btn btn-secondary" onclick="filterCollection('ask')">问古笺</button>
+                <button class="btn btn-secondary" onclick="filterCollection('mood')">今朝心笺</button>
+                <button class="btn btn-secondary" onclick="filterCollection('lot')">灵签</button>
+                <button class="btn btn-secondary" onclick="filterCollection('dream')">梦华笺</button>
+                <button class="btn btn-secondary" onclick="filterCollection('music')">弦上方</button>
+            </div>
+            <div id="collection-list"></div>
+        </div>
+
+        <div class="section-title">3. 行迹录</div>
+        <div class="card">
+            <div id="history-list"></div>
+        </div>
+
+        <div class="section-title">4. 心象图</div>
+        <div class="card">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                    <p style="font-size: 12px; color: var(--color-bamboo);">最常出现的心境</p>
+                    <p id="stats-mood" style="font-size: 20px; font-weight: 600; color: var(--color-moss);">心静</p>
+                </div>
+                <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                    <p style="font-size: 12px; color: var(--color-bamboo);">最喜欢的文化意象</p>
+                    <p id="stats-image" style="font-size: 20px; font-weight: 600; color: var(--color-ink-blue);">松风</p>
+                </div>
+                <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                    <p style="font-size: 12px; color: var(--color-bamboo);">最常阅读的古籍</p>
+                    <p id="stats-book" style="font-size: 20px; font-weight: 600; color: var(--color-moss);">庄子</p>
+                </div>
+                <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                    <p style="font-size: 12px; color: var(--color-bamboo);">最常使用的音方</p>
+                    <p id="stats-music" style="font-size: 20px; font-weight: 600; color: var(--color-ink-blue);">春水入梦</p>
+                </div>
+            </div>
+            <div style="margin-top: 16px; background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                <p style="font-size: 12px; color: var(--color-bamboo); margin-bottom: 8px;">本月收藏数量</p>
+                <div style="height: 20px; background: rgba(45, 90, 74, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div id="stats-collection-bar" style="height: 100%; background: var(--color-moss); width: 60%; border-radius: 10px;"></div>
+                </div>
+                <p style="text-align: right; font-size: 14px; color: var(--color-moss); margin-top: 4px;" id="stats-collection-count">12 件</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            classics: [
+                { name: '论语', author: '孔子', desc: '儒家经典，记录孔子及其弟子言行' },
+                { name: '庄子', author: '庄周', desc: '道家经典，主张自然无为' },
+                { name: '道德经', author: '老子', desc: '道家经典，阐述宇宙万物之道' },
+                { name: '诗经', author: '佚名', desc: '中国最早的诗歌总集' },
+                { name: '楚辞', author: '屈原', desc: '浪漫主义诗歌代表作' },
+                { name: '周易', author: '周文王', desc: '古代占卜与哲学经典' },
+                { name: '史记', author: '司马迁', desc: '中国第一部纪传体通史' },
+                { name: '孙子兵法', author: '孙武', desc: '古代军事战略经典' }
+            ],
+            quotes: [
+                { text: '知者不惑，仁者不忧，勇者不惧。', source: '论语·子罕', explain: '智慧的人不会迷惑，仁爱的人不会忧愁，勇敢的人不会畏惧。' },
+                { text: '天行健，君子以自强不息。', source: '周易·乾', explain: '天的运行刚健有力，君子应当效仿天道，不断自我进取。' },
+                { text: '海纳百川，有容乃大。', source: '庄子·秋水', explain: '大海容纳千百条河流，因为有包容心所以宽广博大。' },
+                { text: '人生天地之间，若白驹过隙，忽然而已。', source: '庄子·知北游', explain: '人生在世，就像白马跳过缝隙一样短暂，转瞬即逝。' },
+                { text: '上善若水，水善利万物而不争。', source: '道德经·第八章', explain: '最高境界的善就像水一样，滋润万物而不与之相争。' },
+                { text: '路漫漫其修远兮，吾将上下而求索。', source: '楚辞·离骚', explain: '道路漫长而遥远，我将上下求索，追寻真理。' },
+                { text: '学而不思则罔，思而不学则殆。', source: '论语·为政', explain: '学习而不思考就会迷茫，思考而不学习就会危险。' },
+                { text: '塞翁失马，焉知非福。', source: '淮南子·人间训', explain: '边塞老翁丢失马匹，谁知这不是好事呢？祸福相依。' },
+                { text: '不积跬步，无以至千里。', source: '荀子·劝学', explain: '不积累每一小步，就无法到达千里之外。' },
+                { text: '君子坦荡荡，小人长戚戚。', source: '论语·述而', explain: '君子心胸宽广，小人则常常忧愁不安。' },
+                { text: '居安思危，思则有备，有备无患。', source: '左传·襄公十一年', explain: '处在安逸环境中要想到危险，想到了就有准备，有准备就不会有祸患。' },
+                { text: '不以物喜，不以己悲。', source: '岳阳楼记', explain: '不因外物的好坏和自己的得失而或喜或悲。' },
+                { text: '山重水复疑无路，柳暗花明又一村。', source: '陆游·游山西村', explain: '山峦重叠水流曲折正担心无路可走，柳绿花艳忽然眼前又出现一个山村。' },
+                { text: '长风破浪会有时，直挂云帆济沧海。', source: '李白·行路难', explain: '相信总有一天，能借助长风破浪前行，直挂高帆横渡沧海。' },
+                { text: '千淘万漉虽辛苦，吹尽狂沙始到金。', source: '刘禹锡·浪淘沙', explain: '经过千遍万遍的淘洗虽然辛苦，但吹尽狂沙才能得到真金。' }
+            ],
+            qingtan: [
+                { title: '古人如何度过漫长冬夜？', content: '古人冬夜有"围炉夜话"的传统，三五知己围坐炉边，煮茶论道，读书弹琴。古人说："绿蚁新醅酒，红泥小火炉。晚来天欲雪，能饮一杯无？"' },
+                { title: '古人如何表达思念之情？', content: '古人常以鸿雁、明月、流水等意象表达思念。"但愿人长久，千里共婵娟"，"鸿雁传书"的典故更是流传千古。' },
+                { title: '古人如何看待时间？', content: '古人认为"逝者如斯夫，不舍昼夜"，也相信"一寸光阴一寸金"。但他们更懂得"静以修身，俭以养德"，在慢节奏中体会时光的真谛。' },
+                { title: '古人的养生智慧有哪些？', content: '古人讲究"顺时而食"、"起居有常"、"心平气和"。《黄帝内经》云："恬淡虚无，真气从之；精神内守，病安从来？"' },
+                { title: '古人如何看待挫折与困境？', content: '古人认为"天将降大任于斯人也，必先苦其心志"。面对困境，他们以"穷则独善其身，达则兼济天下"的态度处之。' }
+            ],
+            moods: {
+                '心静': { desc: '心如止水，波澜不惊', quote: '心无挂碍，无挂碍故，无有恐怖。', source: '心经', advice: '今日宜静心读书，品茶冥想。古人云："静以修身，俭以养德。"', action: '找一处安静的角落，读几页书，品一杯茶。' },
+                '疲惫': { desc: '身心俱疲，需要休养', quote: '劳则思，思则善心生。', source: '国语', advice: '今日宜休息调养，听一曲舒缓的音乐。《黄帝内经》云："起居有常，不妄作劳。"', action: '放下手中事务，闭目养神十五分钟。' },
+                '焦虑': { desc: '思虑过多，难以安宁', quote: '君子坦荡荡，小人长戚戚。', source: '论语', advice: '今日宜放下执念，专注当下。古人云："勿扰心，勿乱情，顺其自然。"', action: '写下焦虑的事情，然后告诉自己"慢慢来"。' },
+                '犹疑': { desc: '犹豫不决，难以抉择', quote: '当断不断，反受其乱。', source: '史记', advice: '今日宜静心思考，听从内心。古人云："三思而后行，行则无悔。"', action: '列出利弊清单，选择最符合内心的答案。' },
+                '期待': { desc: '心怀希望，憧憬未来', quote: '长风破浪会有时，直挂云帆济沧海。', source: '李白', advice: '今日宜规划未来，脚踏实地。古人云："不积跬步，无以至千里。"', action: '写下一个小目标，并制定第一步计划。' },
+                '孤独': { desc: '独处之时，内心宁静', quote: '独与天地精神往来。', source: '庄子', advice: '今日宜享受独处，与自己对话。古人云："君子慎独。"', action: '写一篇日记，记录此刻的心情。' },
+                '振奋': { desc: '精神抖擞，意气风发', quote: '天生我材必有用，千金散尽还复来。', source: '李白', advice: '今日宜把握时机，勇敢行动。古人云："乘势而上，顺势而为。"', action: '立即行动，完成一件拖延已久的事。' }
+            },
+            lots: {
+                '学业': [
+                    { type: '上签', title: '金榜题名', content: '十年寒窗无人问，一举成名天下知。', explain: '你的努力终将得到回报，继续保持专注，学业有成。', action: '今日宜静心读书，复习重点内容。' },
+                    { type: '中签', title: '循序渐进', content: '欲速则不达，见小利则大事不成。', explain: '学习需要循序渐进，不要急于求成，打好基础最重要。', action: '制定学习计划，每天进步一点点。' },
+                    { type: '下签', title: '反思精进', content: '学而不思则罔，思而不学则殆。', explain: '当前需要反思学习方法，调整策略，方能进步。', action: '回顾近期学习，找出问题所在。' }
+                ],
+                '事业': [
+                    { type: '上签', title: '鹏程万里', content: '大鹏一日同风起，扶摇直上九万里。', explain: '你的事业正处于上升期，抓住机遇，大展宏图。', action: '主动承担新任务，展示自己的能力。' },
+                    { type: '中签', title: '厚积薄发', content: '博观而约取，厚积而薄发。', explain: '当前需要积累经验，提升能力，等待时机成熟。', action: '学习一项新技能，提升专业能力。' },
+                    { type: '下签', title: '稳中求进', content: '行稳致远，久久为功。', explain: '事业发展需要稳扎稳打，不可急躁冒进。', action: '审视当前工作，确保每一步都扎实。' }
+                ],
+                '人际': [
+                    { type: '上签', title: '四海之内皆兄弟', content: '有朋自远方来，不亦乐乎？', explain: '你人缘极佳，近期会有贵人相助，朋友相聚。', action: '主动联系一位老朋友，增进情谊。' },
+                    { type: '中签', title: '以和为贵', content: '和气生财，家和万事兴。', explain: '与人相处以和为贵，多一份包容，少一份争执。', action: '今日宜倾听他人意见，保持平和心态。' },
+                    { type: '下签', title: '慎言慎行', content: '言多必失，行多必过。', explain: '说话做事需谨慎，避免无心之言伤害他人。', action: '今日少言多听，三思而后行。' }
+                ],
+                '心情': [
+                    { type: '上签', title: '心旷神怡', content: '采菊东篱下，悠然见南山。', explain: '心情舒畅，烦恼尽消，享受当下的美好时光。', action: '外出散步，亲近自然，放松心情。' },
+                    { type: '中签', title: '顺其自然', content: '行到水穷处，坐看云起时。', explain: '不必强求，顺其自然，一切都会好起来的。', action: '放下执念，做一件让自己开心的事。' },
+                    { type: '下签', title: '静心养性', content: '静以修身，俭以养德。', explain: '内心需要宁静，远离喧嚣，修养身心。', action: '独处片刻，冥想或听音乐放松。' }
+                ],
+                '随心': [
+                    { type: '上签', title: '心想事成', content: '有志者，事竟成，破釜沉舟，百二秦关终属楚。', explain: '你的愿望终将实现，保持信念，坚持到底。', action: '为目标迈出第一步，不要犹豫。' },
+                    { type: '中签', title: '顺其自然', content: '尽人事，听天命。', explain: '做好自己该做的，剩下的交给时间。', action: '专注于当下，做好眼前的事。' },
+                    { type: '下签', title: '静待时机', content: '时来天地皆同力，运去英雄不自由。', explain: '当前时机未到，耐心等待，厚积薄发。', action: '韬光养晦，提升自己，等待时机。' }
+                ]
+            },
+            music: {
+                '安神': { name: '松风入梦', desc: '如松间清风，舒缓心神，助你安然入眠。', frequency: 396 },
+                '入梦': { name: '春水泛舟', desc: '如春水潺潺，宁静致远，带你进入梦乡。', frequency: 417 },
+                '专注': { name: '竹韵清音', desc: '如竹林清风，澄明心境，提升专注力。', frequency: 528 },
+                '清心': { name: '空山新雨', desc: '如雨后空山，清新自然，洗净心灵尘埃。', frequency: 639 },
+                '振志': { name: '长风破浪', desc: '如乘风破浪，激昂奋进，激发斗志豪情。', frequency: 741 }
+            },
+            letters: [
+                {
+                    category: '励志',
+                    mood: '振奋',
+                    title: '与君书·砥砺篇',
+                    author: '退之',
+                    content: '吾友亲启：\n\n闻君意气风发，胸怀壮志，我亦为之欣然。\n\n《周易》云：「天行健，君子以自强不息。」天道运行不息，君子当效法之。我曾说：「业精于勤，荒于嬉；行成于思，毁于随。」勤勉立业，深思成事，此千古不易之理。\n\n项羽破釜沉舟，勾践卧薪尝胆，有志者事竟成。然亦不必苛责自己，累了便歇一歇，望望天上的云，再继续赶路便好。\n\n「长风破浪会有时，直挂云帆济沧海。」我信你终能乘风破浪，抵达心之所向。与君共勉。'
+                },
+                {
+                    category: '励志',
+                    mood: '期待',
+                    title: '与君书·厚积篇',
+                    author: '子瞻',
+                    content: '贤友如晤：\n\n知你心怀期待，正望着远方。这股子盼望的劲儿，真好。\n\n《老子》云：「合抱之木，生于毫末；千里之行，始于足下。」苏洵年近三十始发愤读书，齐白石中年学画，大器晚成，非虚言也。\n\n不必急着要结果。我曾说：「博观而约取，厚积而薄发。」日子久了，积累够了，时机一到，自然迸发光芒。慢慢来，比较快。\n\n「千淘万漉虽辛苦，吹尽狂沙始到金。」不急，我陪着你等。'
+                },
+                {
+                    category: '哲理',
+                    mood: '心静',
+                    title: '与君书·静心篇',
+                    author: '庄周',
+                    content: '吾友安处：\n\n听说你心如止水，波澜不惊。这般心境，着实难得。\n\n我曾言：「心斋者，虚而待物也。」心腾空了，才能装得下万物；心静了，才能照得见天地。颜回居陋巷，一箪食一瓢饮，不改其乐，非无欲也，乃心有所主。\n\n《心经》云：「心无挂碍，无挂碍故，无有恐怖。」若能看透五蕴皆空，心便没有挂碍，恐惧自消。不必强求，往那方向慢慢走就好。\n\n「采菊东篱下，悠然见南山。」愿你常能体会这般悠然。夜深了，早些歇息。'
+                },
+                {
+                    category: '哲理',
+                    mood: '孤独',
+                    title: '与君书·独处篇',
+                    author: '元亮',
+                    content: '吾友独坐：\n\n知道你近来常一个人，难免觉得孤单。其实啊，独处未必是坏事。\n\n我归隐田园，「采菊东篱下，悠然见南山」，不过是找到了和自然相处的法子。王维独坐幽篁，「深林人不知，明月来相照」，有明月相照，哪里算得寂寞？\n\n《大学》讲「君子慎独」，独处时最能见本心。人生如白驹过隙，独处的时光尤为珍贵，安安静静时，才能听见心里真正的声音。\n\n这空，不也正好可以装些风、装些月、装些诗吗？有明月陪着呢，不孤单的。'
+                },
+                {
+                    category: '祝福',
+                    mood: '期待',
+                    title: '与君书·前程篇',
+                    author: '太白',
+                    content: '贤友如面：\n\n听说你心里揣着希望，正望着远方。好啊，这希望，就是人生最金贵的东西了。\n\n我年轻时仗剑天涯，「仰天大笑出门去，我辈岂是蓬蒿人」，虽碰了不少钉子，可那份心气儿始终没丢。《周易》云「否极泰来」——坏到尽头，好就该来了。\n\n海阔凭鱼跃，天高任鸟飞。你既有鸿鹄之志，就该展开鲲鹏的翅膀。也别光顾着往前冲，偶尔停下来看看风景，日子才有滋味。\n\n「长风破浪会有时，直挂云帆济沧海。」你只管往前走，等风来了，自然能乘风破浪。我在岸上，为你饯行。'
+                },
+                {
+                    category: '祝福',
+                    mood: '心静',
+                    title: '与君书·平安篇',
+                    author: '子瞻',
+                    content: '吾友安好：\n\n见你心平气和，安然自在，我亦欢喜。人这一辈子，最难得的就是「心安」二字。\n\n《尚书》云「五福」，其三曰「康宁」，健康安宁，比有钱有势金贵多了。我当年被贬黄州，穷得叮当响，反倒比在京城做官时踏实。「一蓑烟雨任平生」，人生的福气，不在外头，而在心里头那块清静地。\n\n《庄子》说「安之若命，德之至也」，安于天命，顺其自然，德到了，福就来了。\n\n「但愿人长久，千里共婵娟。」愿你心里头，永远有一轮明月照着。晚安，好梦。'
+                },
+                {
+                    category: '节日',
+                    mood: '期待',
+                    title: '与君书·佳节篇',
+                    author: '摩诘',
+                    content: '吾友临节：\n\n佳节将近，知道你想着家里的人。这份心思，最是人之常情。\n\n我曾写「独在异乡为异客，每逢佳节倍思亲」，一个人在外过节，滋味不好受。可后来想通了——佳节重要的不是吃多好、玩多热闹，是心里头有个牵挂，有个盼着团聚的人。\n\n《礼记》讲「亲其亲，子其子」，疼父母爱孩子，是人的本性。佳节团聚，就是这份本性最真切的体现。\n\n「海上生明月，天涯共此时。」就算有人不在身边，抬头看看那月亮，也是一样的。过节好，好好过节。'
+                },
+                {
+                    category: '节日',
+                    mood: '孤独',
+                    title: '与君书·独酌篇',
+                    author: '子美',
+                    content: '吾友独守：\n\n佳节里一个人，心里头难免空落落的吧？我懂的。\n\n当年我中秋望月，写过「露从今夜白，月是故乡明」。兵荒马乱的，连家信都收不到。可后来想通了——一个人过节，未必就不好。\n\n清明扫墓，中秋赏月，重阳登高，重要的是心诚，不是人多。心诚了，一个人也能感受到那份深意。《庄子》说「独与天地精神往来」，过节时大家都在热闹，你清清静静的，正好和天地说说话。\n\n这孤单里头，是不是也藏着点清静，藏着点自在？「今夜月明人尽望，不知秋思落谁家。」天底下那么多人望着同一轮月亮，你不是一个人。月亮陪着你呢，我也陪着你。'
+                },
+                {
+                    category: '哲理',
+                    mood: '焦虑',
+                    title: '与君书·安心篇',
+                    author: '希文',
+                    content: '吾友勿忧：\n\n听说你近来思虑重重，坐立难安。谁没有个焦虑的时候呢？你不必自责，也不必强撑。\n\n《论语》云「君子坦荡荡，小人长戚戚」。我当年被贬邓州，站在岳阳楼上望着洞庭烟波，忽然想通了——「不以物喜，不以己悲」。有些事能争取，有些事强求不来，能做的尽力做，做不到的就顺其自然。\n\n《心经》讲「心无挂碍，无挂碍故，无有恐怖」。放下执念，心里没有挂碍了，焦虑自然就消了。\n\n「行到水穷处，坐看云起时。」走不动了就坐下，看看天上的云。天塌不下来，你也会好起来的。相信我。'
+                },
+                {
+                    category: '哲理',
+                    mood: '犹疑',
+                    title: '与君书·决断篇',
+                    author: '子长',
+                    content: '吾友三思：\n\n知道你在为选择犯难，左思右想，拿不定主意。这太正常了。\n\n《史记》云「当断不断，反受其乱」。项羽鸿门宴优柔寡断，终致乌江自刎；刘邦当机立断，终得天下。然决断非拍脑袋瞎选，乃深思熟虑后果断行动。\n\n《论语》说「三思而后行」，想三遍再做，不是想三十遍还在想。《孟子》讲「舍生而取义」，义利之间选义，得失之间取大，这个原则把握住了，选择就不难了。\n\n选了就选了，走了就走了，大不了再调整方向。「咬定青山不放松」，认准方向往前走就是了。你可以的，我相信你。'
+                },
+                {
+                    category: '励志',
+                    mood: '疲惫',
+                    title: '与君书·休憩篇',
+                    author: '岐伯',
+                    content: '吾友珍重：\n\n知道你最近累了，身心都乏得很。辛苦了，真的辛苦了。\n\n《黄帝内经》云「起居有常，不妄作劳」。周文王从早忙到晚，终致积劳成疾；陶朱公范蠡功成身退，泛舟五湖，得以善终。一张一弛，文武之道。\n\n《礼记》讲得明白：「张而不弛，文武弗能也。」只拉紧不放松，再好的弓也得断。你对自己太狠了，累了就放下，困了就睡会儿，饿了就吃点好的。天塌不下来。\n\n「采菊东篱下，悠然见南山。」歇着的时候就踏踏实实歇着，别想东想西。等你养好了，咱们再一起看南山的菊花。好好休息，听见了吗？'
+                },
+                {
+                    category: '祝福',
+                    mood: '疲惫',
+                    title: '与君书·康复篇',
+                    author: '子瞻',
+                    content: '吾友勿劳：\n\n知道你身心俱疲，连说话的力气都少了。别硬撑，好好歇歇。\n\n《黄帝内经》云「恬淡虚无，真气从之；精神内守，病安从来」。很多病都是累出来的，想出来的。我当年被贬黄州，整个人都蔫了，后来种地盖房，「一蓑烟雨任平生」，反倒慢慢好了起来。\n\n累了就说累了，撑不住就歇歇，不丢人。《尚书》里「五福」其三曰「康宁」，健康安宁是人生最大的福气。身子垮了，什么理想抱负都是空谈。\n\n「沉舟侧畔千帆过，病树前头万木春。」等你好了，这春天也有你的一份。好好养病，我等你回来。'
+                }
+            ],
+            dreams: {
+                '大海': {
+                    desc: '象征宽广与深邃',
+                    tradition: '古人认为梦见大海主财源广进，或是胸怀宽广的象征。《梦林玄解》云：「梦海，主有大志，能容万物。」',
+                    bagua: '坎卦（☵）——坎为水，主险陷，亦主智慧。梦见大海，对应坎卦之象，示君正处险境之中，然险中有智，智者能化险为夷。',
+                    wuxing: '五行属水——水主智，其性向下，滋润万物。梦海者，肾气旺盛，心思深沉，宜养肾安神，忌惊恐伤精。',
+                    ziwei: '紫微斗数中，梦海对应「天机星」动——天机主智谋变动，梦此者近期思维活跃，宜谋不宜断，待时而动方为上策。',
+                    qimen: '奇门遁甲中，梦海临「休门」——休门主休养生息、蓄势待发。此梦示君当暂避锋芒，蓄积力量，待天时地利人和俱备再行出击。',
+                    freud: '弗洛伊德认为，水在梦中常与无意识及母性回归相关。梦见大海可能暗示梦者渴望回到安全的母体环境，或是对生命起源的深层追问，反映内心对「被包容」与「无条件接纳」的渴求。',
+                    advice: '把握机会，勇敢追求内心的梦想。'
+                },
+                '飞行': {
+                    desc: '象征自由与超越',
+                    tradition: '古人认为梦见飞行主升迁，或是灵魂出窍的体验。《梦林玄解》云：「梦身生羽翼，主超凡脱俗，名扬天下。」',
+                    bagua: '巽卦（☴）——巽为风，主入，亦主顺。梦见飞行，对应巽风之象，示君当顺势而为，如风行天上，无所不至。',
+                    wuxing: '五行属木——木主仁，其性向上，生发条达。梦飞者，肝气升发，志向高远，宜疏肝理气，忌郁怒伤肝。',
+                    ziwei: '紫微斗数中，梦飞对应「贪狼星」动——贪狼主欲望与桃花，梦此者近期野心勃勃，宜将欲望化为动力，忌沉溺享乐。',
+                    qimen: '奇门遁甲中，梦飞临「开门」——开门主开拓、通达。此梦示君正当开门见山之时，宜主动出击，开辟新局。',
+                    freud: '弗洛伊德将飞行梦视为典型的「愿望满足」——梦者以飞翔实现现实中被压抑的「超越限制」的渴望。荣格则视之为个体化过程中「自性」的升华，象征精神层面的觉醒与超越。',
+                    advice: '相信自己的能力，勇敢尝试新事物。'
+                },
+                '故人': {
+                    desc: '象征思念与回忆',
+                    tradition: '古人认为梦见故人主亲友来访，或是思念之情的体现。《梦林玄解》云：「梦故人，主思念之情，或有旧事重提。」',
+                    bagua: '兑卦（☱）——兑为泽，主悦，亦主口。梦见故人，对应兑泽之象，示君当以言语沟通化解心结，重拾旧日情谊。',
+                    wuxing: '五行属金——金主义，其性收敛，沉降肃杀。梦故人者，肺气敏感，易怀旧伤秋，宜润肺养阴，忌悲忧伤肺。',
+                    ziwei: '紫微斗数中，梦故人对应「太阴星」动——太阴主思念与母性，梦此者近期情感丰富，宜静心内省，忌多愁善感。',
+                    qimen: '奇门遁甲中，梦故人临「伤门」——伤门主伤感和合。此梦示君心中有未了之事，宜主动联系旧友，化解陈年心结。',
+                    freud: '弗洛伊德认为，梦见逝者或故人可能是「哀悼工作」的无意识延续，梦者通过梦境反复加工丧失体验。若故人在梦中说话，往往是梦者将自身内心对话投射于其上，借他人之口表达压抑的情感。',
+                    advice: '主动联系亲友，或是整理过去的回忆。'
+                },
+                '考试': {
+                    desc: '象征挑战与压力',
+                    tradition: '古人认为梦见考试主功名，或是近期有重要事情需要准备。《梦林玄解》云：「梦赴考，主将有重任在身，宜早做准备。」',
+                    bagua: '震卦（☳）——震为雷，主动，主惊。梦见考试，对应震雷之象，示君将面临震动与考验，当以镇定之心应之。',
+                    wuxing: '五行属木——木主生发，然过旺则化为压力。梦考者，肝木偏亢，易紧张焦虑，宜平肝潜阳，忌急躁易怒。',
+                    ziwei: '紫微斗数中，梦考对应「天梁星」动——天梁主考验与荫庇，梦此者近期将遇考验，然天梁庇佑，逢凶化吉，宜诚信待人。',
+                    qimen: '奇门遁甲中，梦考临「杜门」——杜门主闭塞、隐藏。此梦示君当韬光养晦，暗自准备，不宜过早暴露实力。',
+                    freud: '弗洛伊德认为，考试焦虑梦是「典型焦虑梦」之一，常见于成年后面临压力情境时。梦者通过重现童年考试焦虑，以象征方式处理现实中的「被评估」恐惧，实为自我对「不够好」的深层担忧之外化。',
+                    advice: '做好准备，相信自己，顺其自然。'
+                },
+                '迷路': {
+                    desc: '象征迷茫与探索',
+                    tradition: '古人认为梦见迷路主困惑，或是需要寻找方向。《梦林玄解》云：「梦迷路，主人生方向不明，当静心思虑。」',
+                    bagua: '坤卦（☷）——坤为地，主顺，主静。梦见迷路，对应坤地之象，示君当如大地般沉稳，静中求方向，不可躁动。',
+                    wuxing: '五行属土——土主信，其性承载包容。梦迷路者，脾胃失和，思虑过度，宜健脾安神，忌忧思伤脾。',
+                    ziwei: '紫微斗数中，梦迷路对应「天同星」动——天同主福乐与慵懒，梦此者近期心志不坚，宜振作精神，确立目标。',
+                    qimen: '奇门遁甲中，梦迷路临「景门」——景门主虚幻、迷惑。此梦示君当辨别真伪，不为表象所惑，静待云开雾散。',
+                    freud: '弗洛伊德视迷路梦为「自我迷失」的象征，梦者在现实生活中失去了方向感，可能源于身份认同危机或人生阶段的过渡焦虑。梦中的路径象征个体的生命轨迹，迷路则暗示对未来的不确定感与对选择的恐惧。',
+                    advice: '静下心来，倾听内心的声音，寻找方向。'
+                },
+                '房屋': {
+                    desc: '象征内心与家庭',
+                    tradition: '古人认为梦见房屋主家宅平安，或是内心世界的反映。《梦林玄解》云：「梦屋宇，主身心安泰，家宅兴旺。」',
+                    bagua: '艮卦（☶）——艮为山，主止，主静。梦见房屋，对应艮山之象，示君当止于当止，安守本分，不可妄动。',
+                    wuxing: '五行属土——土主信，承载万物。梦屋者，脾胃主事，注重家庭与安全感，宜养脾安土，忌思虑过度。',
+                    ziwei: '紫微斗数中，梦屋对应「天府星」动——天府主库藏与安稳定，梦此者近期重视家庭与财产，宜稳守基业，忌冒险投机。',
+                    qimen: '奇门遁甲中，梦屋临「生门」——生门主生机、生长。此梦示君家宅有生气，宜修缮居所，营造温馨家庭氛围。',
+                    freud: '弗洛伊德在《梦的解析》中，将房屋视为梦者自身精神结构的象征——屋顶代表超我，厅堂代表自我，地下室代表本我（无意识）。梦见房屋的状态，往往映射梦者的心理结构与精神状态。',
+                    advice: '关注家人，营造温馨的家庭氛围。'
+                },
+                '动物': {
+                    desc: '象征本能与性格',
+                    tradition: '古人认为不同动物有不同寓意，如龙主贵，虎主威。《梦林玄解》云：「梦龙虎，主大贵；梦牛马，主勤劳。」',
+                    bagua: '依动物而异——龙对应乾卦（☰），虎对应兑卦（☱），马对应离卦（☲），牛对应坤卦（☷）。各卦各象，吉凶不同。',
+                    wuxing: '五行各异——龙属土，虎属金，马属火，牛属土，鼠属水，兔属木。梦不同动物，对应不同脏腑，宜辨证调养。',
+                    ziwei: '紫微斗数中，梦龙对应「紫微星」，梦虎对应「七杀星」，梦马对应「天马星」，各星各性，示君不同运势。',
+                    qimen: '奇门遁甲中，梦动物临不同八门——龙临开门主贵，虎临伤门主威，马临景门主奔走。此梦示君当辨明所梦之动物，以断吉凶。',
+                    freud: '弗洛伊德认为，梦中动物常代表梦者被压抑的本能冲动（id）。动物的形象与行为，往往是无意识欲望的象征化表达。荣格则视动物梦为与集体无意识中原型意象的对话，每种动物都承载着特定的原型能量。',
+                    advice: '了解自己，发挥优势，完善自我。'
+                },
+                '下雨': {
+                    desc: '象征洗礼与新生',
+                    tradition: '古人认为梦见下雨主财运，或是洗涤心灵的象征。《梦林玄解》云：「梦天雨，主天降恩泽，财运亨通。」',
+                    bagua: '坎卦（☵）——坎为水，主险陷，亦主智慧。梦见下雨，对应坎水之象，示君当以智慧化解困境，如雨水洗涤尘埃。',
+                    wuxing: '五行属水——水主智，其性向下。梦雨者，肾气主事，情感流动，宜养肾藏精，忌恐惧伤肾。',
+                    ziwei: '紫微斗数中，梦雨对应「破军星」动——破军主破坏与新生，梦此者近期将有变革，旧去新来，宜顺势而为。',
+                    qimen: '奇门遁甲中，梦雨临「休门」——休门主休养、润泽。此梦示君当如春雨润物，静待时机，滋养身心。',
+                    freud: '弗洛伊德认为，雨在梦中常与情感释放相关，是「被压抑情绪得以宣泄」的象征。下雨的强度与梦者情感压力的程度成正比。荣格则视雨水为「无意识内容的涌现」，象征新的心理能量从深层涌入意识。',
+                    advice: '放下过去，拥抱变化，迎接新的机遇。'
+                },
+                '重逢': {
+                    desc: '象征缘分与机遇',
+                    tradition: '古人认为梦见重逢主贵人，或是缘分未尽。《梦林玄解》云：「梦重逢，主缘分未了，或有贵人相助。」',
+                    bagua: '离卦（☲）——离为火，主明，主丽。梦见重逢，对应离火之象，示君当以光明之心待人，如日照万物，温暖而不灼。',
+                    wuxing: '五行属火——火主礼，其性向上。梦重逢者，心气旺盛，渴望联结，宜养心安神，忌喜伤心气。',
+                    ziwei: '紫微斗数中，梦重逢对应「天相星」动——天相主助人与印信，梦此者近期将遇贵人，宜广结善缘，诚信待人。',
+                    qimen: '奇门遁甲中，梦重逢临「开门」——开门主通达、相遇。此梦示君正当开门迎客之时，宜主动社交，把握机缘。',
+                    freud: '弗洛伊德认为，重逢梦往往承载着「未完成情结」（Zeigarnik效应）——那些在现实中未得到圆满解决的关系，会以梦境形式反复出现。梦中的重逢，是无意识试图为未完成的情感叙事寻找一个结局。',
+                    advice: '珍惜相遇，把握缘分，真诚待人。'
+                }
+            },
+            solarTerms: [
+                '立春', '雨水', '惊蛰', '春分', '清明', '谷雨',
+                '立夏', '小满', '芒种', '夏至', '小暑', '大暑',
+                '立秋', '处暑', '白露', '秋分', '寒露', '霜降',
+                '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
+            ],
+            yiList: ['祭祀', '祈福', '嫁娶', '纳财', '开市', '出行', '读书', '会友', '修造', '动土'],
+            jiList: ['安葬', '行丧', '词讼', '伐木', '作灶', '针灸', '探病', '移徙', '入宅', '破土'],
+            answerModules: {
+                themes: {
+                    'work_stress': {
+                        keywords: ['压力', '工作', '职场', '加班', '累', '疲惫', '焦虑', '忙碌', '负荷', '上班', '996', '内卷', '业绩', '考核', 'KPI', '升职', '加薪', '领导', '同事', '项目', 'deadline', '熬夜', '过劳', '倦怠', '身心俱疲', '忙不过来', '压力大', '很累', '心累', '打工'],
+                        name: '事业压力',
+                        opening: '闻君言及事业压力，身心俱疲，此诚当下世人通病也。古人云「劳而不怨」者，非不疲也，乃得其道也。愿以三则古训，为君解此困局。',
+                        letterReply: '吾友珍重：\n\n知道你最近工作辛苦，每天从早忙到晚，连喝口茶的工夫都没有。辛苦了，真的辛苦了。别硬撑着，该歇就歇一歇。\n\n古人讲「一张一弛，文武之道」，你想啊，只把弓弦拉紧不放松，再好的弓也得断。周文王那样的圣人，「朝于西，夕于东，不遑宁处」，最后都积劳成疾，何况你我凡人呢？陶朱公范蠡帮越王灭了吴国，功成名就之后说走就走，泛舟五湖，最后得了善终。进和退之间，藏着养生的大道啊。\n\n你现在最该做的，不是咬牙坚持，是给身体一个喘息的机会。事情永远做不完，可身子是自己的。累了就放下手头的事，喝杯热茶，望望窗外的云，哪怕只有十分钟。等养足了精神，再做也不迟。\n\n《大学》说「物有本末，事有终始」，工作也得分个主次轻重。别什么事都往自己肩上扛，该让人做的就让人做，该推的就推。天塌不下来，就算塌下来，也有高个子顶着呢，轮不到你一个人扛。\n\n好好歇着，别想太多。等你养好了精神，咱们再一起往前走。我陪着你。',
+                        passages: [
+                            {
+                                quote: '张而不弛，文武弗能也；弛而不张，文武弗为也；一张一弛，文武之道也。',
+                                source: '《礼记·杂记下》',
+                                explanation: '此言谓只紧张不放松，文王武王亦不能行；只放松不紧张，文王武王亦不为之。一张一弛，方为正道。君之疲惫，正源于只张不弛，日积月累，必伤身心。',
+                                example: '昔陶朱公范蠡辅越灭吴，功成身退，泛舟五湖，得以善终；而周文王「朝于西，夕于东，不遑宁处」，终致积劳成疾。一进一退之间，足见张弛之妙。',
+                                modern: '今人当学此道，工作之时全力以赴，休憩之时彻底放松。每日留一段不被打扰的「心斋时刻」，或品茶读书，或闭目养神，让身心在张弛之间恢复元气。'
+                            },
+                            {
+                                quote: '君子坦荡荡，小人长戚戚。',
+                                source: '《论语·述而》',
+                                explanation: '君子心胸宽广，坦荡无私；小人患得患失，常自寻烦恼。职场压力，多源于得失之心过重。若能以平常心待之，不以物喜，不以己悲，则压力自减。',
+                                example: '范仲淹被贬邓州，作《岳阳楼记》曰「不以物喜，不以己悲」，虽身处逆境而心怀天下，终成一代名臣，名垂青史。',
+                                modern: '面对职场升迁、绩效评比，不必将一时得失看得过重。把目光放长远，专注于工作本身的价值与意义，心宽则路自宽。'
+                            },
+                            {
+                                quote: '物有本末，事有终始。知所先后，则近道矣。',
+                                source: '《大学》',
+                                explanation: '万物有本有末，事事有始有终，知轻重先后，便近于道。工作之压力，多源于不分主次，事事求全，必心力交瘁。',
+                                example: '诸葛孔明治蜀，事必躬亲，罚二十以上皆亲览，终致「鞠躬尽瘁，死而后已」。此诚前车之鉴，当知分权任人之要。',
+                                modern: '工作中当用「四象限法」分清重要紧急之事，先做核心任务，舍弃细枝末节。学会委派与拒绝，方能事半功倍，远离过劳。'
+                            }
+                        ],
+                        closing: '愿君以张弛之道调身心，以坦荡之心对得失，以明辨之智分主次。诗曰：「行到水穷处，坐看云起时。」压力如浪，君若乘风破浪，必达彼岸。',
+                        actions: [
+                            {
+                                poem: '采菊东篱下，悠然见南山。',
+                                advice: '今日午间放下手机一刻钟，闭目静坐，深呼吸十次，体会陶渊明「悠然」之境，让心神归位后再继续工作。'
+                            },
+                            {
+                                poem: '一张一弛，文武之道也。',
+                                advice: '今日将任务分为「紧急」「重要」「可缓」三类，先做最核心一件，其余学会委派或暂置，践行张弛之道。'
+                            },
+                            {
+                                poem: '不以物喜，不以己悲。',
+                                advice: '今日遇一桩不顺之事时，心中默念范仲淹此句三遍，提醒自己不以一时得失为念，保持坦荡心境。'
+                            }
+                        ]
+                    },
+                    'confusion': {
+                        keywords: ['迷茫', '困惑', '方向', '未来', '不知道', '怎么办', '选择', '犹疑', '徘徊', '迷茫', '前路', '人生', '意义', '目标', '理想', '梦想', '前途', '出路', '何去何从', '找不到', '没方向', '很迷茫', '不知道怎么办', '看不清', '迷惘', '纠结', '不知所措', '无所适从'],
+                        name: '人生迷茫',
+                        opening: '闻君言及人生迷茫，不知未来方向，此诚青年常遇之惑也。圣人亦曾「三十而立，四十而不惑」，况吾辈乎？愿以三则古训，为君指路。',
+                        letterReply: '吾友如晤：\n\n知道你最近心里头空落落的，不知道前路该往哪儿走，不知道自己该做什么。我懂，我都懂。迷茫这事儿，谁都经历过，不丢人。\n\n孔夫子那样的圣人，也是到了四十岁才「不惑」呢，你现在迷茫，太正常了。王阳明少年时立志做圣贤，曾经对着竹子「格」了七天七夜，什么都没「格」出来，还大病了一场。可后来呢？他被贬到龙场那样的穷地方，反倒悟出了「心即理」，开创了心学。圣贤之路，都要经过迷茫，何况你我呢？\n\n我跟你说，迷茫其实是好事——说明你在想事情，在往前走，不在混日子。就怕浑浑噩噩一辈子，连迷茫是什么滋味都不知道。\n\n你现在最该做的，不是坐在那儿空想「我该怎么办」，是先迈开腿，走起来再说。每天读几页书，见一个有趣的人，做一件以前没做过的小事——走着走着，路就清楚了。《老子》说「合抱之木，生于毫末；千里之行，始于足下」，再远的路，也是一步一步走出来的。\n\n别急着要答案，答案在路上。山重水复之后，必有柳暗花明。不急，我陪着你慢慢走。',
+                        passages: [
+                            {
+                                quote: '吾十有五而志于学，三十而立，四十而不惑，五十而知天命，六十而耳顺，七十而从心所欲，不逾矩。',
+                                source: '《论语·为政》',
+                                explanation: '孔子自述一生修道历程：十五立志向学，三十立身处世，四十方不再迷惑。可见「不惑」非一蹴而就，乃长期修身之果。君之迷茫，正是成长之征。',
+                                example: '王阳明少年立志做圣贤，曾格竹七日而无所得，直至被贬龙场，于困顿中悟出「心即理」，始创心学。圣贤之路，亦经迷茫，方得豁然。',
+                                modern: '人生不必急于求成，可为自己设定「五年志向」，不必拘泥于具体职业，而着眼于想成为什么样的人。迷茫时回归本心，方向自现。'
+                            },
+                            {
+                                quote: '博学之，审问之，慎思之，明辨之，笃行之。',
+                                source: '《中庸》',
+                                explanation: '广博学习，详细询问，慎重思考，明确辨别，切实实行。五者兼备，则方向自明。迷茫之根，多在于「学不足，思不深，行不笃」。',
+                                example: '司马迁遍游名山大川，网罗天下放失旧闻，终成《史记》一百三十篇。其博学笃行之功，正是破迷茫之利器。',
+                                modern: '迷茫时切忌空想，当以行动破局。每周读一本新书、与一位智者交谈、做一次新尝试，博学笃行，自能拨云见日。'
+                            },
+                            {
+                                quote: '合抱之木，生于毫末；九层之台，起于累土；千里之行，始于足下。',
+                                source: '《老子·六十四章》',
+                                explanation: '合抱大树生于细小幼芽，九层高台起于每一筐土，千里远行始于脚下第一步。大事皆由小事积累而成，不必急于一时之方向。',
+                                example: '左思构思十年，门庭藩溷皆置纸笔，终成《三都赋》，洛阳为之纸贵。可见积少成多，终成大器。',
+                                modern: '不必一夜之间看清人生方向，先做今日能做之事。每天专注做好一件小事，日积月累，未来轮廓自会清晰。'
+                            }
+                        ],
+                        closing: '愿君博学审问，慎思明辨，笃行不怠，终得人生方向。诗曰：「山重水复疑无路，柳暗花明又一村。」迷茫之后，必是豁然开朗。',
+                        actions: [
+                            {
+                                poem: '千里之行，始于足下。',
+                                advice: '今日写下三件力所能及的小事并完成其一，体会「始于足下」之意，让迷茫在行动中渐渐消散。'
+                            },
+                            {
+                                poem: '博学之，审问之，慎思之。',
+                                advice: '今日选一本与所惑相关之书读半小时，做一条读书札记，践行「博学审问」之道以破迷茫。'
+                            },
+                            {
+                                poem: '山重水复疑无路，柳暗花明又一村。',
+                                advice: '今日独自散步二十分钟，行至一处未曾到过之地，体悟陆游诗中「又一村」之惊喜，让心走出迷茫。'
+                            }
+                        ]
+                    },
+                    'relationship': {
+                        keywords: ['感情', '恋爱', '分手', '失恋', '孤独', '朋友', '人际', '相处', '矛盾', '爱情', '恋人', '对象', '男朋友', '女朋友', '前任', '复合', '吵架', '冷战', '闺蜜', '兄弟', '社交', '内向', '社恐', '孤独感', '没人陪', '一个人', '想念', '思念', '暗恋', '表白', '被拒', '亲情', '家人', '父母', '婆媳'],
+                        name: '情感人际',
+                        opening: '闻君言及情感困扰，愿以古人智慧为君解忧。情之一字，自古难解，然古人处世之道，可为我辈明灯。愿以三则古训，为君指引。',
+                        letterReply: '吾友安好：\n\n情之一字，最是磨人。我知道你现在心里不好受，堵得慌，像有块石头压着。没关系，想哭就哭出来，别憋着。\n\n古人说「君子之交淡若水」，你仔细琢磨这话——真心的朋友，不必天天黏在一起，像水一样平淡，却能长久。管仲和鲍叔牙，性格差那么远，一个贪财一个仗义，可鲍叔牙懂管仲的才华，不跟他计较这些小节，最后成了「管鲍之交」，传了几千年。这就是「和而不同」的道理啊。\n\n我跟你说，不管是朋友还是恋人，先学会和自己做朋友，把自己照顾好了，对的人自然会来。别为了讨好谁，委屈了自己；也别为了留住谁，丢了自己的本心。你若盛开，清风自来。\n\n若是分手了，也别太难过。缘分这东西，来了就珍惜，走了就放手。就像《庄子》说的「相濡以沫，不如相忘于江湖」，有时候放手，是放过对方，也是放过自己。\n\n别难过太久。天还长，路还远，对的人在前面等着你呢。有我陪着你，怕什么。',
+                        passages: [
+                            {
+                                quote: '君子和而不同，小人同而不和。',
+                                source: '《论语·子路》',
+                                explanation: '君子与人和谐相处，却不盲目附和；小人表面附和，内心却各怀心思。良好关系，贵在「和而不同」——尊重差异，保持自我。',
+                                example: '管仲与鲍叔牙，性格迥异，鲍叔知管仲之才，不以小过为意，终成「管鲍之交」，传为千古美谈。此乃「和而不同」之典范。',
+                                modern: '人际交往中，不必迎合他人以换取认同。保持真实自我，尊重他人不同，方能交到真心朋友，建立长久关系。'
+                            },
+                            {
+                                quote: '君子之交淡若水，小人之交甘若醴。',
+                                source: '《庄子·山木》',
+                                explanation: '君子之交清淡如水，却能长久；小人之交甘甜如酒，却易变质。真情不必时时黏腻，适当距离反生敬意。',
+                                example: '白居易与元稹，相隔千里而诗书往来不辍，「同是天涯沦落人」之句，传唱千年。其交虽淡，其情至深。',
+                                modern: '亲密关系亦需「留白」，不必时刻在线秒回。给彼此独处空间，反能让感情历久弥新，此即「淡若水」之现代义。'
+                            },
+                            {
+                                quote: '爱人不亲，反其仁；治人不治，反其智；礼人不答，反其敬。行有不得者皆反求诸己。',
+                                source: '《孟子·离娄上》',
+                                explanation: '爱人而人不亲我，当反问自己是否仁；治理人而人不服，当反问自己是否智。凡事不顺，皆当反求诸己，而非归咎于人。',
+                                example: '大禹治水，三过家门而不入，闻善言则拜。其治水成功，正源于反躬自省、虚怀纳谏之德。',
+                                modern: '关系遇阻时，与其指责对方，不如先审视自身。问一句「我哪里可以做得更好」，往往能打开僵局，重建联结。'
+                            }
+                        ],
+                        closing: '愿君以「和而不同」处众，以「淡若水」交友，以「反求诸己」修身。诗曰：「海内存知己，天涯若比邻。」真心相待，虽远亦近。',
+                        actions: [
+                            {
+                                poem: '海内存知己，天涯若比邻。',
+                                advice: '今日主动联系一位久未联络之友，发一句问候，不谈目的，只续情谊，践行「淡若水」之交。'
+                            },
+                            {
+                                poem: '己所不欲，勿施于人。',
+                                advice: '今日与人相处时，开口前先自问「我若处其位，愿闻此言否」，以此「反求诸己」之心化解一桩小矛盾。'
+                            },
+                            {
+                                poem: '独坐幽篁里，弹琴复长啸。',
+                                advice: '今日独处半小时，做一件令自己愉悦之事，学会与自己为友，方能与他人真诚相处。'
+                            }
+                        ]
+                    },
+                    'learning': {
+                        keywords: ['学习', '读书', '考试', '考研', '考证', '知识', '进步', '坚持', '放弃', '学业', '学生', '上课', '作业', '论文', '毕业', '留学', '雅思', '托福', '四六级', '高考', '中考', '公务员', '考公', '考编', '背诵', '记忆', '效率', '专注力', '拖延', '学不进去', '看不懂', '学不会', '提高', '提升', '自学'],
+                        name: '学业精进',
+                        opening: '闻君言及学习之困，愿以古人治学之道为君解惑。学不可以已，然贵在得其法、守其恒。愿以三则古训，为君加油。',
+                        letterReply: '吾友勉之：\n\n学习这事儿，急不得。我知道你现在心里急，觉得进度慢，觉得记不住，觉得别人都比你强。别急，慢慢来。\n\n你知道王献之吧？王羲之的儿子，从小跟着父亲学书法，磨了十八缸水才学成大家。还有那个左思，写《三都赋》，构思了十年，家里到处都放着纸笔，想到一句就写一句，最后写成了，洛阳的人争着抄，把纸都买贵了，叫「洛阳纸贵」。你看，哪有什么一蹴而就，都是日积月累积攒出来的。\n\n别光死记硬背，要边学边想。《论语》说「学而不思则罔，思而不学则殆」，只学不想，越学越糊涂；只想不学，越想越虚。读完一段，合上书想想讲了啥，想不通再翻回去，这样才记得牢。\n\n还有啊，别贪多。每天哪怕只学十分钟，坚持下来也比三天打鱼两天晒网强。《荀子》说「锲而不舍，金石可镂」，刻几下就放弃，朽木都刻不断；一直刻下去，金石都能雕出花来。\n\n慢慢来，比较快。你行的，我信你。等你学成了，咱们一起喝酒庆祝。',
+                        passages: [
+                            {
+                                quote: '学而时习之，不亦说乎？',
+                                source: '《论语·学而》',
+                                explanation: '学得知识并按时温习实践，岂不令人喜悦？学习之乐，不在记诵，而在「时习」——反复践行，化为己有，方生真乐。',
+                                example: '王羲之临池学书，池水尽黑；其子王献之磨尽十八缸水，终成大家。可见「时习」之功，方能化知识为技艺。',
+                                modern: '学新知识后，二十四小时内至少复述或应用一次。用「费曼学习法」讲给他人听，方能将「所学」化为「所能」。'
+                            },
+                            {
+                                quote: '学而不思则罔，思而不学则殆。',
+                                source: '《论语·为政》',
+                                explanation: '只学不思，则迷惘无得；只思不学，则危殆不安。学与思如车之两轮，缺一不可。学而不思者，如食而不化；思而不学者，如无源之水。',
+                                example: '孔子学琴于师襄子，一曲习毕不复另学，而是反复思索其志其人，直至悟出「文王之操」。此乃学思并重之典范。',
+                                modern: '读书时随手做笔记与批注，每读一章必写三点感悟。输入与思考并重，方能避免「读完即忘」的窘境。'
+                            },
+                            {
+                                quote: '锲而舍之，朽木不折；锲而不舍，金石可镂。',
+                                source: '《荀子·劝学》',
+                                explanation: '刻几下就放弃，朽木也刻不断；不停地刻下去，金石也能雕刻。学习之要在「不舍」——非一时之勇，乃长久之恒。',
+                                example: '司马迁受腐刑而不屈，历十四年而成《史记》；李时珍历二十七年，三易其稿，著成《本草纲目》。恒心所至，金石为开。',
+                                modern: '设立「最小可行学习量」，如每日十分钟不中断。用「习惯打卡」记录连续天数，让坚持成为本能，而非意志消耗。'
+                            }
+                        ],
+                        closing: '愿君以「时习」为乐，以「学思并重」为法，以「锲而不舍」为志。诗曰：「十年寒窗无人问，一举成名天下知。」今日之苦，明日之甜。',
+                        actions: [
+                            {
+                                poem: '学而不思则罔，思而不学则殆。',
+                                advice: '今日读完一段内容后，合上书默写三点要义，再开卷校对，践行「学思并重」之古训。'
+                            },
+                            {
+                                poem: '锲而不舍，金石可镂。',
+                                advice: '今日为自己设定连续二十一日的小目标，画一张打卡表贴于案头，以「锲而不舍」之心养成一学习习惯。'
+                            },
+                            {
+                                poem: '纸上得来终觉浅，绝知此事要躬行。',
+                                advice: '今日选一近日所学知识点，用于解决一个实际问题，践行「时习」与「躬行」之道。'
+                            }
+                        ]
+                    },
+                    'decision': {
+                        keywords: ['选择', '决定', '犹豫', '纠结', '取舍', '权衡', '机会', '前途', '抉择', '选哪个', '要不要', '能不能', '该不该', '要不要去', '要不要做', '两难', '难以抉择', '举棋不定', '优柔寡断', '瞻前顾后', '左思右想', '拿不定主意', '决断', '决心', '转行', '跳槽', '创业', '辞职', 'offer', '参军', '考公', '出国'],
+                        name: '人生抉择',
+                        opening: '闻君言及人生抉择之难，愿以古人智慧为君指点。当断不断，反受其乱，然抉择有道，可免后患。愿以三则古训，为君解忧。',
+                        letterReply: '吾友三思：\n\n选择难，我懂。站在岔路口，左边是一条路，右边是另一条路，不知道选哪条才对，怕选错了后悔，怕错过了什么。这种心情，我太懂了。\n\n可你想啊，站在路口不动，永远到不了任何地方。《史记》里写春申君「当断不断，反受其乱」，该拿主意的时候不拿主意，后患无穷。你看鸿门宴上的项羽，优柔寡断放走了刘邦，最后落得乌江自刎；刘邦呢？当机立断，进了咸阳，约法三章，最后得了天下。\n\n当然了，我不是让你拍脑袋瞎选。《论语》说「三思而后行」，想三遍，差不多了就该行动了。想三十遍还在想，那不是谨慎，是怯懦。\n\n怎么选呢？我教你一个法子——闭上眼睛，问问自己的本心：你到底想要什么？什么对你最重要？《孟子》说「鱼我所欲也，熊掌亦我所欲也；二者不可得兼，舍鱼而取熊掌者也」，义和利摆在一起，选义不选利；大得和小失摆在一起，取大不取小。把最核心的东西抓住了，选择就不难了。\n\n选了就别回头，大不了走错了再调整方向，总比原地纠结强。你可以的。决定了就往前走，我给你壮胆。',
+                        passages: [
+                            {
+                                quote: '三思而后行。',
+                                source: '《论语·公冶长》',
+                                explanation: '凡事当再三思考而后行动。然「三思」非犹豫不决，乃深思熟虑之谓。思利弊、思后果、思本心，三者俱明，方可决断。',
+                                example: '季文子三思而后行，子闻之曰「再，斯可矣」。孔子之意，思之太过反失时机，适度即可。可见抉择当求「思之有度，行之果断」。',
+                                modern: '重大决策可列「利弊清单」，每项打分加权；同时问自己「三年后是否会后悔」。理性与直觉并重，方能做出明智之选。'
+                            },
+                            {
+                                quote: '鱼，我所欲也；熊掌，亦我所欲也。二者不可得兼，舍鱼而取熊掌者也。',
+                                source: '《孟子·告子上》',
+                                explanation: '鱼与熊掌皆我所欲，不可兼得时，当舍鱼取熊掌。人生之路充满取舍，当分清主次轻重，择其重者而从之。',
+                                example: '陶渊明不为五斗米折腰事乡里小人，遂辞彭泽令，归园田居。其舍禄位而取自由，千古传颂。',
+                                modern: '面对多个诱人选项，先问「什么对我最重要」——是家庭、健康、事业还是自由？以核心价值观为秤，取舍自明。'
+                            },
+                            {
+                                quote: '当断不断，反受其乱。',
+                                source: '《史记·春申君列传》',
+                                explanation: '当决断时不决断，反受其祸。抉择之后，最忌反复动摇。深思既毕，当果断行动，纵有失误，亦可调整，远胜踟蹰不前。',
+                                example: '项羽鸿门宴上优柔寡断，放走刘邦，终致乌江自刎；刘邦当机立断入咸阳，约法三章，终得天下。决断之明，乃成事关键。',
+                                modern: '设定「决策截止日」，到日必决。一旦决定，给予自己「不可反悔」的承诺期（如三十天），全力以赴后再评估，避免内耗。'
+                            }
+                        ],
+                        closing: '愿君以「三思」明理，以「舍鱼取熊掌」定心，以「当断则断」行事。诗曰：「咬定青山不放松，立根原在破岩中。」坚定前行，终成大事。',
+                        actions: [
+                            {
+                                poem: '三思而后行。',
+                                advice: '今日为所纠结之事列一张利弊清单，每项打分，再问自己「三年后是否后悔」，以「三思」之法助决。'
+                            },
+                            {
+                                poem: '鱼与熊掌不可兼得。',
+                                advice: '今日写下「对我最重要的三件事」，以此为秤衡量所择之选项，舍轻取重，践行孟子取舍之道。'
+                            },
+                            {
+                                poem: '当断不断，反受其乱。',
+                                advice: '今日为悬而未决之事设定一个截止日，到日必决，决后三十日不反悔，体会「当断则断」之爽利。'
+                            }
+                        ]
+                    },
+                    'anxiety': {
+                        keywords: ['焦虑', '烦躁', '不安', '担心', '害怕', '恐惧', '紧张', '失眠', '慌', '心慌', '心烦', '心绪不宁', '坐立不安', '寝食难安', '忧心忡忡', '担惊受怕', '胡思乱想', '想太多', '放不下', '忐忑', '焦躁', '急躁', '心慌意乱', '七上八下', '心神不宁', '睡不好', '睡不着', '噩梦', '抑郁', '情绪低落', '难过'],
+                        name: '内心焦虑',
+                        opening: '闻君言及内心焦虑，难以安宁，愿以古人静心之道为君解忧。焦虑之根，在于心有挂碍；安心之法，古人备矣。愿以三则古训，为君安神。',
+                        letterReply: '吾友勿忧：\n\n我知道你最近心里头乱糟糟的，像揣了只乱撞的兔子，坐也不是站也不是，夜里还睡不着，饭也吃不下。先别想那么多，先跟着我说的，深呼吸——慢慢吸气，缓缓呼气，再来一次。\n\n《论语》说「君子坦荡荡，小人长戚戚」，君子心胸开阔，坦坦荡荡；小人心事计较，自寻烦恼。话说得轻巧，做起来难，我年轻的时候，也常常愁得整宿睡不着觉，后来经历的事多了，才慢慢看开些。\n\n《心经》里讲「心无挂碍，无挂碍故，无有恐怖，远离颠倒梦想」。你细琢磨这话——很多事啊，你控制不了的，操心也没用；能做的，尽力了就尽力了，做不到的，就放下。挂碍少了，心就宽了；心宽了，那些烦心事自然就来了。\n\n范仲淹当年被贬邓州，站在岳阳楼上望着洞庭湖的烟波浩渺，不也想通了吗？「不以物喜，不以己悲」。外物的好坏，自己的得失，都不必看得太重。\n\n走不动了就坐下，看看天上的云。天塌不下来，你也会好起来的。相信我。',
+                        passages: [
+                            {
+                                quote: '心无挂碍，无挂碍故，无有恐怖，远离颠倒梦想。',
+                                source: '《般若波罗蜜多心经》',
+                                explanation: '心无牵挂阻碍，故无有恐惧，远离虚妄之念。焦虑之根，在于心有所执——执于得失、执于未来、执于他人之评。放下执念，则焦虑自消。',
+                                example: '苏轼被贬黄州，身处绝境而作《赤壁赋》，曰「寄蜉蝣于天地，渺沧海之一粟」。其心无挂碍，故能于逆境中得旷达之乐。',
+                                modern: '焦虑时可用「五感归位法」：说出五件所见、四件所触、三件所闻、二件所嗅、一件所尝，将心拉回当下，远离颠倒梦想。'
+                            },
+                            {
+                                quote: '君子坦荡荡，小人长戚戚。',
+                                source: '《论语·述而》',
+                                explanation: '君子心胸坦荡，不为外物所扰；小人患得患失，常自寻烦恼。焦虑多源于「长戚戚」——为未发生之事忧，为不可控之事愁。',
+                                example: '颜回「一箪食，一瓢饮，在陋巷，人不堪其忧，回也不改其乐」。心胸坦荡，则外境虽苦，内里自安。',
+                                modern: '区分「可控之事」与「不可控之事」。前者全力以赴，后者学会放下。心胸既宽，焦虑自无立足之地。'
+                            },
+                            {
+                                quote: '物有本末，事有终始。知所先后，则近道矣。',
+                                source: '《大学》',
+                                explanation: '万物有本有末，事事有始有终，知先后之序，便近于道。焦虑多源于千头万绪、不知从何下手，若能理清主次，则心自安。',
+                                example: '诸葛孔明隆中对策，未出茅庐已定三分天下，正因其能洞察本末先后，故临大事而不乱。',
+                                modern: '焦虑时将所虑之事一一列出，按「紧急—重要」分类，先做一件最重要的小事。行动是焦虑最好的解药，理清则心定。'
+                            }
+                        ],
+                        closing: '愿君以「心无挂碍」破执念，以「坦荡荡」扩胸怀，以「知先后」理头绪。诗曰：「采菊东篱下，悠然见南山。」静心之境，愿君常得。',
+                        actions: [
+                            {
+                                poem: '采菊东篱下，悠然见南山。',
+                                advice: '今日焦虑来袭时，闭目深呼吸十次，想象陶渊明「悠然见南山」之境，让心神暂离纷扰，归位再行。'
+                            },
+                            {
+                                poem: '心无挂碍，无有恐怖。',
+                                advice: '今日将所虑之事写于纸上，区分「可控」与「不可控」，前者列行动步骤，后者学着放下，践行「心无挂碍」。'
+                            },
+                            {
+                                poem: '行到水穷处，坐看云起时。',
+                                advice: '今日选一项能让自己专注投入之事，如练字、散步、烹饪，全神贯注半小时，体会王维「坐看云起」之当下心境。'
+                            }
+                        ]
+                    },
+                    'health': {
+                        keywords: ['身体', '健康', '生病', '疲劳', '失眠', '养生', '锻炼', '休息', '病了', '不舒服', '头疼', '胃疼', '腰酸', '背痛', '没精神', '没力气', '虚弱', '调理', '补品', '中药', '艾灸', '推拿', '健身', '跑步', '减肥', '增肌', '熬夜', '作息', '饮食', '上火', '感冒', '发烧', '咳嗽', '过敏', '皮肤', '颈椎', '腰椎'],
+                        name: '身心养生',
+                        opening: '闻君言及身体之困，愿以古人养生之道为君解忧。身心一体，养身亦须养心。愿以三则古训，为君调养。',
+                        letterReply: '吾友珍重：\n\n身子是自己的，别不当回事。我知道你总想着「再撑一会儿」「忙完这阵再说」，可你想过没有，身子要是垮了，什么理想抱负都是空的。\n\n《黄帝内经》讲「起居有常，不妄作劳」，作息规律，劳逸结合，才能养生长寿。这话谁都懂，可真做起来，难啊。我见过太多人，年轻的时候拿命换钱，老了拿钱换命，划不来。\n\n你看看那周文王，「朝于西，夕于东，不遑宁处」，从早忙到晚，连歇口气的工夫都没有，最后积劳成疾。再看看陶朱公范蠡，帮越王灭了吴国，功成名就之后说走就走，泛舟五湖，最后得了善终。进和退之间，藏着养生的大道啊。\n\n别总觉得自己还年轻，熬熬没关系。不是的。身体就像银行，你天天透支，总有一天要还的。好好吃饭，好好睡觉，比什么补品都管用。该睡就睡，别熬夜；该歇就歇，别硬撑。\n\n养好了精神再上路。我等你回来，咱们一起看南山的菊花。好好养病，听见了吗？',
+                        passages: [
+                            {
+                                quote: '起居有常，不妄作劳。',
+                                source: '《黄帝内经·上古天真论》',
+                                explanation: '作息有规律，不妄自操劳。起居无常，则气血逆乱；妄自作劳，则精气耗损。养生之根本，在于顺应自然之节律。',
+                                example: '药王孙思邈年逾百岁，其养生之道重在「起居有常，饮食有节，动静有度」。寿至唐高宗永淳元年，享寿百余。',
+                                modern: '固定每日入睡与起床时间，周末不超过一小时偏差。规律作息胜过任何补品，是养生第一要义。'
+                            },
+                            {
+                                quote: '恬淡虚无，真气从之；精神内守，病安从来？',
+                                source: '《黄帝内经·上古天真论》',
+                                explanation: '内心恬淡虚无，真气自然顺从；精神内守不散，疾病何由而来？养生非独养身，更须养心。心神安宁，则百病不侵。',
+                                example: '陶渊明归园田居，「采菊东篱下，悠然见南山」，心境恬淡，故能于清贫中得长寿之乐。',
+                                modern: '每日留十分钟「数字断舍离」——远离手机，静坐或冥想，让精神内守。养心之效，胜过千般保健品。'
+                            },
+                            {
+                                quote: '五谷为养，五果为助，五畜为益，五菜为充。',
+                                source: '《黄帝内经·素问》',
+                                explanation: '五谷用以滋养，五果用以辅助，五畜用以补益，五菜用以充盈。饮食之道，贵在均衡多样，不偏不嗜。',
+                                example: '乾隆帝饮食讲究「五谷为养」，荤素搭配，少食多餐，故享寿八十九，为历代帝王之冠。',
+                                modern: '每餐饭盘宜「半菜四谷一肉」——半盘蔬菜、四分之一谷物、四分之一蛋白。少油少盐少糖，方合古人「饮食有节」之训。'
+                            }
+                        ],
+                        closing: '愿君以「起居有常」立其本，以「恬淡虚无」养其心，以「五谷为养」调其食。诗曰：「采菊东篱下，悠然见南山。」身心康泰，愿君常享。',
+                        actions: [
+                            {
+                                poem: '起居有常，不妄作劳。',
+                                advice: '今日设定固定就寝时间，不晚于子时，连续坚持一周，体会「起居有常」对精气神之改善。'
+                            },
+                            {
+                                poem: '恬淡虚无，真气从之。',
+                                advice: '今日远离手机等电子设备半小时，静坐冥想或闭目养神，践行「精神内守」，让心神归于恬淡。'
+                            },
+                            {
+                                poem: '五谷为养，五菜为充。',
+                                advice: '今日三餐按「半菜四谷一肉」之比例搭配，少油少盐，践行《内经》饮食之道，调养脾胃。'
+                            }
+                        ]
+                    },
+                    'success': {
+                        keywords: ['成功', '失败', '挫折', '困难', '挑战', '机遇', '奋斗', '努力', '搞砸了', '做不好', '不行', '自卑', '没自信', '没信心', '气馁', '泄气', '灰心', '失望', '绝望', '放弃', '坚持不住', '撑不住', '熬不下去', '低谷', '逆境', '不顺', '倒霉', '运气差', '咸鱼翻身', '逆袭', '突破', '超越', '证明自己', '不甘心', '不服输'],
+                        name: '成败得失',
+                        opening: '闻君言及成败得失，愿以古人智慧为君解忧。祸福相倚，成败相生，古人明此理久矣。愿以三则古训，为君打气。',
+                        letterReply: '吾友勿馁：\n\n挫败的滋味不好受，我知道。心里头沉甸甸的，像压了块石头，连说话的力气都没有。没关系，先缓一缓，别逼自己。\n\n老子说「祸兮福之所倚，福兮祸之所伏」，你细品这话——今天的败，说不定是明天成的伏笔呢？塞翁失马，焉知非福。当年越王勾践，被吴王夫差打得亡国了，给人当奴仆，卧薪尝胆了十年，最后不也把吴国灭了吗？谁笑到最后，还不一定呢。\n\n《孟子》说「天将降大任于斯人也，必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂乱其所为」。你现在吃的这些苦，受的这些罪，说不定都是老天爷在考验你呢。挺过去了，就是另一番天地。\n\n跌倒了没关系，谁没跌倒过呢？重要的是，跌倒了要爬起来。拍拍身上的土，揉揉摔疼的地方，接着走就是了。总不能一直在地上躺着吧？\n\n长风破浪会有时。别灰心，我信你。等你熬过去了，咱们一起喝庆功酒。',
+                        passages: [
+                            {
+                                quote: '祸兮福之所倚，福兮祸之所伏。',
+                                source: '《老子·五十八章》',
+                                explanation: '祸患之中倚伏着福报，福报之中潜伏着祸患。成败得失，原非绝对。今日之败，或为明日之成埋下伏笔；眼前之成，亦可能暗藏后患。',
+                                example: '塞翁失马，焉知非福。其马亡而引胡马归，子折股而保命。祸福转化，非一时可见。',
+                                modern: '遇挫折时不妨问「此事教会我什么」。把失败视为反馈而非终局，便能于逆境中寻得转机，化祸为福。'
+                            },
+                            {
+                                quote: '天将降大任于斯人也，必先苦其心志，劳其筋骨，饿其体肤，空乏其身，行拂乱其所为，所以动心忍性，曾益其所不能。',
+                                source: '《孟子·告子下》',
+                                explanation: '上天将降大任于人，必先磨炼其心志，劳苦其筋骨，使其身处困境，以此动摇其心、坚韧其性，增其原本不能之能。挫折乃成长之阶梯。',
+                                example: '司马迁受腐刑而作《史记》，韩信受胯下之辱而终成兵仙。大任之前，必有非常之磨砺。',
+                                modern: '将当前困难视为「升级关卡」，问自己「过此关后我能获得什么新能力」。以成长型思维看待挫折，韧性自生。'
+                            },
+                            {
+                                quote: '锲而不舍，金石可镂。',
+                                source: '《荀子·劝学》',
+                                explanation: '不停地刻下去，金石也能雕刻。成功无捷径，唯在「不舍」二字。一时之败不足惧，惧者，半途而废也。',
+                                example: '李时珍历二十七年，三易其稿，著成《本草纲目》；左思构思十年，终成《三都赋》。坚持到底者，方见金石可镂之奇迹。',
+                                modern: '设定「最小日进度」，哪怕每天只前进一分。一年后便是数十倍之进步。复利之力，源于「锲而不舍」。'
+                            }
+                        ],
+                        closing: '愿君以「祸福相倚」看待得失，以「天降大任」砥砺心志，以「锲而不舍」坚持到底。诗曰：「长风破浪会有时，直挂云帆济沧海。」终达彼岸。',
+                        actions: [
+                            {
+                                poem: '祸兮福之所倚。',
+                                advice: '今日将所遇挫折写下，旁列三条「此事可能带来的积极转变」，践行老子祸福相倚之智，转换心境。'
+                            },
+                            {
+                                poem: '锲而不舍，金石可镂。',
+                                advice: '今日为一长期目标设定「最小日进度」，哪怕只读一页书、写一段话，连续打卡二十一日，体会「锲而不舍」之力。'
+                            },
+                            {
+                                poem: '长风破浪会有时，直挂云帆济沧海。',
+                                advice: '今日写下心中所求之大志，贴于案头显眼处，每日晨起默念一遍，以李白之豪情激励自己坚定前行。'
+                            }
+                        ]
+                    }
+                },
+                emotions: {
+                    'anxious': { keywords: ['焦虑', '烦躁', '不安', '担心'], desc: '焦虑不安' },
+                    'sad': { keywords: ['难过', '伤心', '失落', '沮丧'], desc: '悲伤失落' },
+                    'angry': { keywords: ['生气', '愤怒', '不满', '委屈'], desc: '愤怒不满' },
+                    'confused': { keywords: ['困惑', '迷茫', '不知所措'], desc: '困惑迷茫' },
+                    'tired': { keywords: ['累', '疲惫', '疲倦', '乏力'], desc: '疲惫不堪' },
+                    'hopeful': { keywords: ['希望', '期待', '憧憬', '信心'], desc: '满怀希望' }
+                }
+            }
+        };
+
+        let currentLotTheme = '随心';
+        let currentMusicTheme = '安神';
+        let currentAskResult = null;
+        let audioContext = null;
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            const navItems = document.querySelectorAll('.nav-item');
+            const ids = ['home', 'ask', 'today', 'dream', 'collection'];
+            navItems[ids.indexOf(pageId)].classList.add('active');
+            window.scrollTo(0, 0);
+            if (pageId === 'today') renderCalendar();
+            if (pageId === 'collection') renderCollection();
+        }
+
+        function goToPage(pageId) {
+            const input = document.getElementById('home-input');
+            if (input && input.value.trim() && pageId === 'ask') {
+                document.getElementById('ask-input').value = input.value;
+            }
+            switchPage(pageId);
+        }
+
+        function analyzeQuestion(question) {
+            let theme = 'confusion';
+            let emotion = 'confused';
+            let themeScore = 0;
+            let emotionScore = 0;
+            
+            for (const [key, value] of Object.entries(data.answerModules.themes)) {
+                let score = 0;
+                for (const keyword of value.keywords) {
+                    if (question.includes(keyword)) {
+                        score++;
+                    }
+                }
+                if (score > themeScore) {
+                    themeScore = score;
+                    theme = key;
+                }
+            }
+            
+            for (const [key, value] of Object.entries(data.answerModules.emotions)) {
+                let score = 0;
+                for (const keyword of value.keywords) {
+                    if (question.includes(keyword)) {
+                        score++;
+                    }
+                }
+                if (score > emotionScore) {
+                    emotionScore = score;
+                    emotion = key;
+                }
+            }
+            
+            return { theme, emotion };
+        }
+
+        function generatePersonalizedReply(question) {
+            const analysis = analyzeQuestion(question);
+            const themeModule = data.answerModules.themes[analysis.theme];
+            const letterText = themeModule.letterReply || themeModule.opening;
+            const authorMap = {
+                'work_stress': '岐伯',
+                'confusion': '子瞻',
+                'relationship': '希文',
+                'learning': '退之',
+                'decision': '子长',
+                'anxiety': '希文',
+                'health': '岐伯',
+                'success': '太白'
+            };
+            const author = authorMap[analysis.theme] || '古人';
+
+            const paragraphs = letterText.split('\n').filter(p => p.trim());
+            let html = `<p class="letter-title">与君书</p>`;
+            paragraphs.forEach(function(p) {
+                if (p.trim()) {
+                    html += `<p style="margin-bottom: 12px; text-indent: 2em; line-height: 2.2; color: var(--color-ink); white-space: pre-line;">${p}</p>`;
+                }
+            });
+            html += `<p class="letter-author">—— ${author}</p>`;
+            return html;
+        }
+
+        function generateActionContent(question) {
+            const analysis = analyzeQuestion(question);
+            const themeModule = data.answerModules.themes[analysis.theme];
+            const actionItem = getRandomItem(themeModule.actions);
+            const authorMap = {
+                'work_stress': '岐伯', 'confusion': '子瞻', 'relationship': '希文',
+                'learning': '退之', 'decision': '子长', 'anxiety': '希文',
+                'health': '岐伯', 'success': '太白'
+            };
+            const author = authorMap[analysis.theme] || '古人';
+
+            const userReplies = {
+                'work_stress': [
+                    '先生所言极是，然每日案牍劳形，上司催促、同侪竞争，何处寻得片刻之弛？',
+                    '张弛之道我已略知，只是事务缠身，分身乏术，又当如何？',
+                    '听先生一席话，如醍醐灌顶。今日便当试着放下些事务，养精蓄锐。'
+                ],
+                'confusion': [
+                    '圣人亦有迷茫之时，倒令我稍感宽慰。只是前路茫茫，不知该从何处着力？',
+                    '博学笃行之道我明白了，可每日琐事缠身，如何抽身去做这些事？',
+                    '先生之语，如暗夜明灯。我愿从今日起，积跬步以至千里。'
+                ],
+                'relationship': [
+                    '和而不同，说来容易做来难。若是对方咄咄逼人，又当如何处之？',
+                    '淡若水之交，我有所悟。只是心中仍有不舍，如何才能放下？',
+                    '反求诸己，确是我平日少做的功课。今日便当以此心处世。'
+                ],
+                'learning': [
+                    '时习之乐，我从前竟未曾体会。只是读书常觉枯燥，如何方能乐在其中？',
+                    '学思并重，我已知其理。可读过的书转眼便忘，又当如何？',
+                    '锲而不舍，金石可镂——先生之言令我惭愧。我愿从今日起，日日不辍。'
+                ],
+                'decision': [
+                    '三思而行，我已思之再三，却愈思愈乱，又当如何？',
+                    '舍鱼取熊掌，道理我懂。可何为鱼、何为熊掌，我却分辨不清。',
+                    '当断则断，先生说得是。我再犹豫下去，只怕错失良机。今日便当决断。'
+                ],
+                'anxiety': [
+                    '心无挂碍，谈何容易？我夜里辗转反侧，满脑子都是那些烦心事。',
+                    '坦荡荡的心境，我甚是向往。只是身处这纷扰世间，如何能做到？',
+                    '先生之言如清风拂面。我愿试着放下执念，今日便从一件小事做起。'
+                ],
+                'health': [
+                    '起居有常，我自知理亏。只是事务繁忙，哪有时间规律作息？',
+                    '恬淡虚无，这四个字说来轻巧，做起来何其之难。',
+                    '先生之言令我警醒。身子是本钱，我今日便当早些歇息。'
+                ],
+                'success': [
+                    '祸福相倚，这道理我懂。可眼前这一败，实在令人心灰意冷。',
+                    '天降大任之说，令我稍感振奋。只是这磨砺何时是个头？',
+                    '锲而不舍，我记下了。跌倒了爬起来便是，总不能一直在地上躺着。'
+                ]
+            };
+
+            const replies = userReplies[analysis.theme] || userReplies['confusion'];
+
+            let html = '';
+
+            html += `<div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px; margin-bottom: 20px;">`;
+            html += `<p style="font-size: 13px; color: var(--color-bamboo); margin-bottom: 6px;">君之初问</p>`;
+            html += `<p style="font-size: 15px; color: var(--color-ink); line-height: 1.8;">${question}</p>`;
+            html += `</div>`;
+
+            themeModule.passages.forEach(function(passage, index) {
+                html += `<div style="margin-bottom: 24px;">`;
+
+                html += `<div style="display: flex; gap: 12px; margin-bottom: 16px;">`;
+                html += `<div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--color-moss); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600;">${author[0]}</div>`;
+                html += `<div style="flex: 1; background: rgba(232, 238, 244, 0.6); padding: 14px 16px; border-radius: 4px 12px 12px 12px;">`;
+                html += `<p style="font-size: 12px; color: var(--color-bamboo); margin-bottom: 6px;">${author} · 第${index + 1}书</p>`;
+                html += `<p style="color: var(--color-moss); font-weight: 600; font-size: 15px; margin-bottom: 8px;">「${passage.quote}」</p>`;
+                html += `<p style="color: var(--color-bamboo); font-size: 12px; margin-bottom: 10px;">—— ${passage.source}</p>`;
+                html += `<p style="font-size: 14px; color: var(--color-ink); line-height: 1.8;">${passage.explanation}</p>`;
+                html += `</div></div>`;
+
+                if (replies[index]) {
+                    html += `<div style="display: flex; gap: 12px; margin-bottom: 16px; justify-content: flex-end;">`;
+                    html += `<div style="flex: 1; background: rgba(180, 200, 180, 0.2); padding: 14px 16px; border-radius: 12px 4px 12px 12px; border-right: 3px solid #1E3A5F; max-width: 80%;">`;
+                    html += `<p style="font-size: 12px; color: #1E3A5F; margin-bottom: 6px; text-align: right;">君 · 复${index + 1}</p>`;
+                    html += `<p style="font-size: 14px; color: var(--color-ink); line-height: 1.8;">${replies[index]}</p>`;
+                    html += `</div>`;
+                    html += `<div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #1E3A5F; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600;">君</div>`;
+                    html += `</div>`;
+                }
+
+                html += `<div style="display: flex; gap: 12px; margin-bottom: 16px;">`;
+                html += `<div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--color-moss); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600;">${author[0]}</div>`;
+                html += `<div style="flex: 1; background: rgba(232, 238, 244, 0.6); padding: 14px 16px; border-radius: 4px 12px 12px 12px;">`;
+                html += `<p style="font-size: 12px; color: var(--color-bamboo); margin-bottom: 6px;">${author} · 复${index + 1}</p>`;
+                html += `<p style="font-size: 13px; color: var(--color-bamboo); line-height: 1.8; margin-bottom: 8px;">【史鉴】${passage.example}</p>`;
+                html += `<p style="font-size: 13px; color: var(--color-ink-blue); line-height: 1.8;">【今鉴】${passage.modern}</p>`;
+                html += `</div></div>`;
+
+                html += `</div>`;
+            });
+
+            const adviceHtml = `
+                <div style="background: linear-gradient(135deg, rgba(201, 178, 112, 0.15) 0%, rgba(106, 142, 42, 0.1) 100%); padding: 18px; border-radius: 8px; border-left: 4px solid var(--color-gold);">
+                    <p style="font-size: 13px; color: var(--color-bamboo); margin-bottom: 8px;">${author} · 临别赠言</p>
+                    <p style="font-style: italic; color: var(--color-gold); font-size: 16px; margin-bottom: 10px;">「${actionItem.poem}」</p>
+                    <p style="color: var(--color-moss); font-size: 14px; line-height: 1.8;">${actionItem.advice}</p>
+                </div>
+            `;
+
+            return { html: html, adviceHtml: adviceHtml, action: actionItem };
+        }
+
+        function generateAnswer() {
+            const input = document.getElementById('ask-input');
+            const question = input.value.trim();
+            if (!question) {
+                alert('请先写下你的问题');
+                return;
+            }
+            const loading = document.getElementById('ask-loading');
+            const result = document.getElementById('ask-result');
+            loading.style.display = 'flex';
+            result.style.display = 'none';
+            setTimeout(() => {
+                const analysis = analyzeQuestion(question);
+                const themeModule = data.answerModules.themes[analysis.theme];
+                const emotionModule = data.answerModules.emotions[analysis.emotion];
+
+                const reply = generatePersonalizedReply(question);
+                const actionContent = generateActionContent(question);
+                const quote = data.quotes.find(q => themeModule.name.includes('压力') && q.text.includes('忧') ||
+                                                    themeModule.name.includes('迷茫') && q.text.includes('惑') ||
+                                                    themeModule.name.includes('情感') && q.text.includes('友') ||
+                                                    themeModule.name.includes('学习') && q.text.includes('学') ||
+                                                    themeModule.name.includes('抉择') && q.text.includes('断') ||
+                                                    themeModule.name.includes('焦虑') && q.text.includes('惧') ||
+                                                    themeModule.name.includes('养生') && q.text.includes('安') ||
+                                                    themeModule.name.includes('成败') && q.text.includes('志')) ||
+                              getRandomItem(data.quotes);
+
+                currentAskResult = {
+                    question: question,
+                    reply: reply,
+                    quote: quote.text,
+                    source: quote.source,
+                    explain: quote.explain,
+                    connection: `君之困惑，在于${themeModule.name}，${emotionModule.desc}。古人之智慧，穿越千年，正可为君解惑。`,
+                    action: actionContent.action
+                };
+
+                document.getElementById('ask-question').textContent = question;
+                document.getElementById('ask-action').innerHTML = actionContent.html;
+                document.getElementById('ask-advice').innerHTML = actionContent.adviceHtml;
+                document.getElementById('ask-quote').textContent = quote.text;
+                document.getElementById('ask-source').textContent = '—— ' + quote.source;
+                document.getElementById('ask-explain').textContent = quote.explain;
+                document.getElementById('ask-connection').textContent = currentAskResult.connection;
+                const replyDiv = document.getElementById('ask-reply');
+                replyDiv.classList.remove('scroll-unfold');
+                void replyDiv.offsetWidth;
+                replyDiv.classList.add('scroll-unfold');
+                replyDiv.innerHTML = currentAskResult.reply;
+                document.getElementById('ask-music').innerHTML = `
+                    <p style="font-size: 16px;">${themeModule.name}专属音方 · 静心安神</p>
+                    <button class="btn btn-secondary" onclick="playMusic('chinese-guzheng')">播放音方</button>
+                `;
+                loading.style.display = 'none';
+                result.style.display = 'block';
+            }, 2500);
+        }
+
+        function fillSampleQuestion() {
+            const questions = [
+                '最近工作压力很大，该如何调整心态？',
+                '面对选择时总是犹豫不决，该怎么办？',
+                '感觉自己很迷茫，不知道未来该往哪里走？',
+                '如何才能做到内心平静，不为外界所扰？',
+                '想要学习新知识，但总是三分钟热度怎么办？'
+            ];
+            document.getElementById('ask-input').value = getRandomItem(questions);
+        }
+
+        let currentMood = '';
+        let currentLetterCategory = '励志';
+        let currentFontStyle = 'song';
+        let currentFontSize = 'regular';
+        let currentBackground = 'paper';
+
+        function selectMood(mood) {
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            currentMood = mood;
+            const loading = document.getElementById('mood-loading');
+            const result = document.getElementById('mood-result');
+            loading.style.display = 'flex';
+            result.style.display = 'none';
+            setTimeout(() => {
+                const moodData = data.moods[mood];
+                const music = getRandomItem(Object.values(data.music));
+                const categories = ['励志', '哲理', '祝福', '节日'];
+                const availableCategories = categories.filter(cat => 
+                    data.letters.some(l => l.category === cat && (l.mood === mood || l.mood === 'all'))
+                );
+                const defaultCategory = availableCategories.includes(currentLetterCategory) ? currentLetterCategory : availableCategories[0] || '励志';
+                currentLetterCategory = defaultCategory;
+                
+                result.innerHTML = `
+                    <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px;">
+                        <p style="font-size: 14px; color: var(--color-bamboo);">心境解读</p>
+                        <p style="font-size: 18px; font-weight: 600; color: var(--color-moss);">${moodData.desc}</p>
+                    </div>
+                    <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px; margin-top: 12px;">
+                        <p style="font-size: 14px; color: var(--color-bamboo);">古人寄语</p>
+                        <p style="font-size: 16px; font-style: italic;">"${moodData.quote}"</p>
+                        <p style="font-size: 12px; color: var(--color-bamboo);">—— ${moodData.source}</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div class="category-tabs">
+                            ${categories.map(cat => `
+                                <span class="category-tab ${cat === currentLetterCategory ? 'active' : ''}" onclick="selectLetterCategory('${cat}')">${cat}</span>
+                            `).join('')}
+                        </div>
+                        <div id="letter-content" class="letter-scroll letter-paper scroll-unfold font-song font-regular bg-paper" style="padding: 30px;">
+                            <p class="letter-title">${getLetterByCategory(currentLetterCategory).title}</p>
+                            <div style="line-height: 2.2; text-indent: 2em; white-space: pre-line;">${getLetterByCategory(currentLetterCategory).content}</div>
+                            <p class="letter-author">—— ${getLetterByCategory(currentLetterCategory).author}</p>
+                        </div>
+                    </div>
+                    <div class="personalize-bar">
+                        <span style="font-size: 12px; color: var(--color-bamboo); margin-right: 8px;">字体：</span>
+                        <button class="personalize-btn ${currentFontStyle === 'song' ? 'active' : ''}" onclick="changeFontStyle('song')">宋体</button>
+                        <button class="personalize-btn ${currentFontStyle === 'kai' ? 'active' : ''}" onclick="changeFontStyle('kai')">楷体</button>
+                        <span style="font-size: 12px; color: var(--color-bamboo); margin-left: 16px; margin-right: 8px;">字号：</span>
+                        <button class="personalize-btn ${currentFontSize === 'regular' ? 'active' : ''}" onclick="changeFontSize('regular')">常规</button>
+                        <button class="personalize-btn ${currentFontSize === 'large' ? 'active' : ''}" onclick="changeFontSize('large')">大号</button>
+                        <span style="font-size: 12px; color: var(--color-bamboo); margin-left: 16px; margin-right: 8px;">背景：</span>
+                        <button class="personalize-btn ${currentBackground === 'paper' ? 'active' : ''}" onclick="changeBackground('paper')">宣纸</button>
+                        <button class="personalize-btn ${currentBackground === 'parchment' ? 'active' : ''}" onclick="changeBackground('parchment')">羊皮</button>
+                        <button class="personalize-btn ${currentBackground === 'silk' ? 'active' : ''}" onclick="changeBackground('silk')">绢丝</button>
+                        <button class="personalize-btn ${currentBackground === 'bamboo' ? 'active' : ''}" onclick="changeBackground('bamboo')">竹青</button>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <p style="font-size: 14px; color: var(--color-moss);">今日建议</p>
+                        <p style="font-size: 15px; line-height: 1.8;">${moodData.advice}</p>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <p style="font-size: 14px; color: var(--color-moss);">今日行动</p>
+                        <p style="font-size: 15px; line-height: 1.8; color: var(--color-ink-blue);">${moodData.action}</p>
+                    </div>
+                    <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="saveToCollection('mood')">珍藏心笺</button>
+                        <button class="btn btn-secondary" onclick="playMusic('chinese-guzheng')">听${music.name}</button>
+                        <button class="btn btn-secondary" onclick="copyLetter()">复制信件</button>
+                        <button class="btn btn-secondary" onclick="shareLetter()">分享寄语</button>
+                    </div>
+                `;
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                saveToHistory('mood', { mood: mood, desc: moodData.desc });
+            }, 1500);
+        }
+
+        function getLetterByCategory(category) {
+            const matchingLetters = data.letters.filter(l => l.category === category && (l.mood === currentMood || l.mood === 'all'));
+            if (matchingLetters.length > 0) {
+                return getRandomItem(matchingLetters);
+            }
+            return data.letters.find(l => l.category === category) || data.letters[0];
+        }
+
+        function selectLetterCategory(category) {
+            currentLetterCategory = category;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            const letterDiv = document.getElementById('letter-content');
+            const letter = getLetterByCategory(category);
+            letterDiv.classList.remove('scroll-unfold');
+            void letterDiv.offsetWidth;
+            letterDiv.classList.add('scroll-unfold');
+            letterDiv.innerHTML = `
+                <p class="letter-title">${letter.title}</p>
+                <div style="line-height: 2.2; text-indent: 2em; white-space: pre-line;">${letter.content}</div>
+                <p class="letter-author">—— ${letter.author}</p>
+            `;
+        }
+
+        function changeFontStyle(style) {
+            currentFontStyle = style;
+            const letterDiv = document.getElementById('letter-content');
+            letterDiv.classList.remove('font-song', 'font-kai');
+            letterDiv.classList.add('font-' + style);
+            document.querySelectorAll('.personalize-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function changeFontSize(size) {
+            currentFontSize = size;
+            const letterDiv = document.getElementById('letter-content');
+            letterDiv.classList.remove('font-regular', 'font-large');
+            letterDiv.classList.add('font-' + size);
+            document.querySelectorAll('.personalize-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function changeBackground(bg) {
+            currentBackground = bg;
+            const letterDiv = document.getElementById('letter-content');
+            letterDiv.classList.remove('bg-paper', 'bg-parchment', 'bg-silk', 'bg-bamboo');
+            letterDiv.classList.add('bg-' + bg);
+            document.querySelectorAll('.personalize-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function copyLetter() {
+            const letter = getLetterByCategory(currentLetterCategory);
+            const text = `【${letter.title}】\n\n${letter.content}\n\n—— ${letter.author}\n\n来自「锦书来」古人寄语`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('信件已复制到剪贴板');
+            }).catch(() => {
+                alert('复制失败，请手动复制');
+            });
+        }
+
+        function shareLetter() {
+            const letter = getLetterByCategory(currentLetterCategory);
+            const text = `【${letter.title}】\n\n${letter.content.substring(0, 100)}……\n\n—— ${letter.author}\n\n来自「锦书来」古人寄语，下载锦书来APP获取更多精彩内容。`;
+            if (navigator.share) {
+                navigator.share({
+                    title: '锦书来 · 古人寄语',
+                    text: text
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('分享内容已复制，请粘贴到社交媒体分享');
+                }).catch(() => {
+                    alert('分享失败，请手动复制');
+                });
+            }
+        }
+
+        function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDay = weekDays[now.getDay()];
+            document.getElementById('cal-gregorian').textContent = `${year}年${month}月${day}日 星期${weekDay}`;
+            const lunarMonths = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+            const lunarDays = ['初', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+            const lunarMonth = lunarMonths[(month + 2) % 12];
+            let lunarDay = '';
+            if (day <= 10) {
+                lunarDay = '初' + (day === 1 ? '' : day);
+            } else if (day <= 20) {
+                lunarDay = '十' + (day - 10);
+            } else if (day <= 30) {
+                lunarDay = '廿' + (day - 20);
+            }
+            document.getElementById('cal-lunar').textContent = `${year}年${lunarMonth}月${lunarDay}`;
+            const solarIndex = Math.floor((now.getMonth() * 30 + day) / 15);
+            const solarTerm = data.solarTerms[solarIndex % 24];
+            document.getElementById('cal-solar').textContent = solarTerm;
+            const luckyTimes = ['辰时(7-9点)', '巳时(9-11点)', '午时(11-13点)', '申时(15-17点)', '酉时(17-19点)'];
+            document.getElementById('cal-lucky').textContent = getRandomItem(luckyTimes);
+            document.getElementById('cal-yi').textContent = getRandomItem(data.yiList) + '、' + getRandomItem(data.yiList) + '、' + getRandomItem(data.yiList);
+            document.getElementById('cal-ji').textContent = getRandomItem(data.jiList) + '、' + getRandomItem(data.jiList) + '、' + getRandomItem(data.jiList);
+            const keywords = ['静', '思', '行', '学', '悟', '善', '和', '勇', '智', '仁'];
+            document.getElementById('cal-keyword').textContent = getRandomItem(keywords);
+            const images = ['松风', '竹韵', '梅香', '兰馨', '荷影', '菊魂', '柳烟', '月魄'];
+            document.getElementById('cal-image').textContent = getRandomItem(images);
+            const tips = [
+                '今日宜品茶读书，静心养性。古人云："茶亦醉人何必酒，书能香我不须花。"',
+                '今日宜早起锻炼，呼吸新鲜空气。《黄帝内经》云："春三月，此谓发陈。"',
+                '今日宜整理房间，清扫心灵。古人云："一屋不扫，何以扫天下？"',
+                '今日宜与朋友相聚，畅谈人生。古人云："有朋自远方来，不亦乐乎？"',
+                '今日宜写下感悟，记录心情。古人云："吾日三省吾身。"'
+            ];
+            document.getElementById('cal-tip').textContent = getRandomItem(tips);
+        }
+
+        function selectLotTheme(theme) {
+            currentLotTheme = theme;
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function drawLot() {
+            const loading = document.getElementById('lot-loading');
+            const result = document.getElementById('lot-result');
+            loading.style.display = 'flex';
+            result.style.display = 'none';
+            setTimeout(() => {
+                const lot = getRandomItem(data.lots[currentLotTheme]);
+                result.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; padding: 20px 40px; background: linear-gradient(135deg, var(--color-paper), var(--color-moon)); border: 2px solid var(--color-gold); border-radius: 12px;">
+                            <p style="font-size: 14px; color: var(--color-bamboo);">${currentLotTheme}签</p>
+                            <p style="font-size: 24px; font-weight: 700; color: ${lot.type === '上签' ? 'var(--color-moss)' : lot.type === '中签' ? 'var(--color-ink-blue)' : '#C75B5B'};">${lot.type}</p>
+                            <p style="font-size: 18px; margin-top: 8px;">${lot.title}</p>
+                        </div>
+                    </div>
+                    <div style="background: rgba(232, 238, 244, 0.5); padding: 20px; border-radius: 8px; text-align: center; margin-top: 16px;">
+                        <p style="font-size: 18px; font-weight: 600; color: var(--color-ink-blue);">${lot.content}</p>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <p style="font-size: 14px; color: var(--color-moss);">签文解释</p>
+                        <p style="font-size: 15px; line-height: 1.8;">${lot.explain}</p>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <p style="font-size: 14px; color: var(--color-moss);">今日行动</p>
+                        <p style="font-size: 15px; line-height: 1.8; color: var(--color-ink-blue);">${lot.action}</p>
+                    </div>
+                    <div style="margin-top: 16px; text-align: center;">
+                        <button class="btn btn-secondary" onclick="saveToCollection('lot')">珍藏此签</button>
+                        <button class="btn btn-primary" onclick="drawLot()">再抽一签</button>
+                    </div>
+                `;
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                saveToHistory('lot', { theme: currentLotTheme, type: lot.type, title: lot.title });
+            }, 2000);
+        }
+
+        function selectMusicTheme(theme) {
+            currentMusicTheme = theme;
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            const loading = document.getElementById('music-loading');
+            const result = document.getElementById('music-result');
+            loading.style.display = 'flex';
+            result.style.display = 'none';
+            setTimeout(() => {
+                const music = data.music[theme];
+                result.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; padding: 20px;">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--color-moss); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; margin: 0 auto; animation: breathing 3s ease-in-out infinite;">🎵</div>
+                        </div>
+                        <h3 style="font-size: 20px; color: var(--color-moss); margin-top: 12px;">${music.name}</h3>
+                        <p style="font-size: 15px; color: var(--color-bamboo);">${music.desc}</p>
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="playMusic('chinese-guzheng')">开始聆听</button>
+                        <button class="btn btn-secondary" style="margin-top: 16px;" onclick="stopMusic()">停止播放</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <p style="font-size: 14px; color: var(--color-bamboo);">音方功效</p>
+                        <p style="font-size: 15px; line-height: 1.8;">此音方采用${music.frequency}Hz频率，有助于${theme === '安神' ? '舒缓神经，放松身心' : theme === '入梦' ? '促进睡眠，进入梦乡' : theme === '专注' ? '提升专注力，提高效率' : theme === '清心' ? '净化心灵，平静内心' : '激发斗志，提振精神'}。</p>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <button class="btn btn-secondary" onclick="saveToCollection('music')">珍藏音方</button>
+                    </div>
+                `;
+                loading.style.display = 'none';
+                result.style.display = 'block';
+            }, 1500);
+        }
+
+        function playMusic(type) {
+            if (audioContext) audioContext.close();
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88];
+            const playNote = (freq, duration, delay) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + delay + duration);
+                osc.start(audioContext.currentTime + delay);
+                osc.stop(audioContext.currentTime + delay + duration);
+            };
+            const melody = [
+                { note: 4, duration: 1.5, delay: 0 },
+                { note: 3, duration: 0.5, delay: 1.5 },
+                { note: 2, duration: 1, delay: 2 },
+                { note: 3, duration: 1, delay: 3 },
+                { note: 4, duration: 1.5, delay: 4 },
+                { note: 4, duration: 1.5, delay: 5.5 },
+                { note: 4, duration: 2, delay: 7 },
+                { note: 3, duration: 1, delay: 9 },
+                { note: 3, duration: 1, delay: 10 },
+                { note: 4, duration: 1, delay: 11 },
+                { note: 3, duration: 1.5, delay: 12 },
+                { note: 2, duration: 1.5, delay: 13.5 }
+            ];
+            melody.forEach(m => playNote(notes[m.note], m.duration, m.delay));
+            alert('音方已开始播放，享受这份宁静吧！');
+        }
+
+        function stopMusic() {
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        function addDreamTag(tag) {
+            const input = document.getElementById('dream-input');
+            if (input.value) {
+                input.value += ' ' + tag;
+            } else {
+                input.value = tag;
+            }
+        }
+
+        function generateDream() {
+            const input = document.getElementById('dream-input');
+            const content = input.value.trim();
+            if (!content) {
+                alert('请先描述你的梦境或选择标签');
+                return;
+            }
+            const loading = document.getElementById('dream-loading');
+            const result = document.getElementById('dream-result');
+            loading.style.display = 'flex';
+            result.style.display = 'none';
+            setTimeout(() => {
+                const tags = ['大海', '飞行', '故人', '考试', '迷路', '房屋', '动物', '下雨', '重逢'];
+                const matchedTags = tags.filter(t => content.includes(t));
+                const dreamTag = matchedTags.length > 0 ? getRandomItem(matchedTags) : getRandomItem(tags);
+                const dreamData = data.dreams[dreamTag];
+                const poems = [
+                    '庄生晓梦迷蝴蝶，望帝春心托杜鹃。',
+                    '梦里不知身是客，一晌贪欢。',
+                    '醉里挑灯看剑，梦回吹角连营。',
+                    '夜阑卧听风吹雨，铁马冰河入梦来。'
+                ];
+                const poem = getRandomItem(poems);
+                const letterHtml = `
+                    <p class="letter-title">梦笺·${dreamTag}</p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">吾友入梦：</p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">闻君梦中所见「${dreamTag}」，此乃${dreamData.desc}。梦者，心之影也，亦是天地之示。古往今来，解梦之道甚多，今为君一一析之，愿有所悟。</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【古籍解梦】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.tradition}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【周易八卦】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.bagua}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【五行生克】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.wuxing}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【紫微斗数】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.ziwei}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【奇门遁甲】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.qimen}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);"><span style="color: var(--color-moss); font-weight: 600;">【西学心解】</span></p>
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">${dreamData.freud}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">综合古今之解，此梦所昭，皆在${dreamData.advice}</p>
+
+                    <p style="margin-bottom: 16px; text-indent: 2em; line-height: 2.2; color: var(--color-ink);">诗曰：「${poem}」梦醒之后，且将所悟，行于今日。</p>
+                    <p class="letter-author">—— 梦笺主人</p>
+                `;
+                result.innerHTML = `
+                    <div class="card book-open">
+                        <h3 class="card-title">🌙 你的梦境</h3>
+                        <p style="font-size: 16px; line-height: 1.8;">${content}</p>
+                    </div>
+                    <div class="card book-open" style="animation-delay: 0.1s;">
+                        <h3 class="card-title">🏷️ 梦中意象</h3>
+                        <p style="font-size: 18px; font-weight: 600; color: var(--color-moss);">${dreamTag} · ${dreamData.desc}</p>
+                    </div>
+                    <div class="card book-open" style="animation-delay: 0.2s;">
+                        <h3 class="card-title">💌 梦笺一封</h3>
+                        <div class="letter-scroll letter-paper font-song font-regular bg-paper scroll-unfold" style="padding: 30px;">${letterHtml}</div>
+                    </div>
+                    <div class="flex" style="justify-content: center; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="saveToCollection('dream')">珍藏梦笺</button>
+                        <button class="btn btn-primary" onclick="generateDream()">再解一梦</button>
+                    </div>
+                `;
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                saveToHistory('dream', { tag: dreamTag, content: content });
+            }, 2500);
+        }
+
+        function saveUserInfo() {
+            const user = {
+                name: document.getElementById('user-name').value || '文友',
+                signature: document.getElementById('user-signature').value || '心若止水，静听花开',
+                mood: document.getElementById('user-mood').textContent || '心静',
+                books: [],
+                instruments: []
+            };
+            localStorage.setItem('jinshulai_user', JSON.stringify(user));
+        }
+
+        function loadUserInfo() {
+            const user = JSON.parse(localStorage.getItem('jinshulai_user') || '{}');
+            document.getElementById('user-name').value = user.name || '';
+            document.getElementById('user-signature').value = user.signature || '';
+            document.getElementById('user-mood').textContent = user.mood || '心静';
+            document.getElementById('user-avatar').textContent = (user.name || '文')[0];
+        }
+
+        function changeUserMood() {
+            const moods = ['心静', '疲惫', '焦虑', '犹疑', '期待', '孤独', '振奋'];
+            const current = document.getElementById('user-mood').textContent;
+            const index = moods.indexOf(current);
+            const next = moods[(index + 1) % moods.length];
+            document.getElementById('user-mood').textContent = next;
+            saveUserInfo();
+        }
+
+        function saveToCollection(type) {
+            const collection = JSON.parse(localStorage.getItem('jinshulai_collection') || '[]');
+            let item = null;
+            if (type === 'ask' && currentAskResult) {
+                item = { type: 'ask', data: currentAskResult, date: new Date().toLocaleDateString() };
+            } else if (type === 'mood') {
+                const mood = document.querySelector('.tag.active')?.textContent || '心静';
+                item = { type: 'mood', data: { mood: mood }, date: new Date().toLocaleDateString() };
+            } else if (type === 'lot') {
+                const result = document.getElementById('lot-result');
+                if (result.style.display !== 'none') {
+                    item = { type: 'lot', data: { theme: currentLotTheme }, date: new Date().toLocaleDateString() };
+                }
+            } else if (type === 'dream') {
+                const input = document.getElementById('dream-input').value;
+                item = { type: 'dream', data: { content: input }, date: new Date().toLocaleDateString() };
+            } else if (type === 'music') {
+                item = { type: 'music', data: { theme: currentMusicTheme }, date: new Date().toLocaleDateString() };
+            }
+            if (item) {
+                collection.push(item);
+                localStorage.setItem('jinshulai_collection', JSON.stringify(collection));
+                alert('已珍藏到藏笺阁');
+            }
+        }
+
+        function saveToHistory(type, data) {
+            const history = JSON.parse(localStorage.getItem('jinshulai_history') || '[]');
+            history.push({ type: type, data: data, date: new Date().toLocaleString() });
+            if (history.length > 50) history.shift();
+            localStorage.setItem('jinshulai_history', JSON.stringify(history));
+        }
+
+        function filterCollection(type) {
+            renderCollection(type);
+        }
+
+        function renderCollection(filter = 'all') {
+            const collection = JSON.parse(localStorage.getItem('jinshulai_collection') || '[]');
+            const list = document.getElementById('collection-list');
+            const filtered = filter === 'all' ? collection : collection.filter(c => c.type === filter);
+            if (filtered.length === 0) {
+                list.innerHTML = `<p style="text-align: center; color: var(--color-bamboo); padding: 20px;">暂无珍藏内容</p>`;
+                return;
+            }
+            list.innerHTML = filtered.map((item, index) => {
+                const icons = { ask: '📜', mood: '💭', lot: '🎋', dream: '🌙', music: '🎵' };
+                const titles = { ask: '问古笺', mood: '今朝心笺', lot: '灵签', dream: '梦华笺', music: '弦上方' };
+                return `
+                    <div style="background: rgba(232, 238, 244, 0.5); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>${icons[item.type]} ${titles[item.type]}</span>
+                            <span style="font-size: 12px; color: var(--color-bamboo);">${item.date}</span>
+                        </div>
+                        <p style="font-size: 14px; margin-top: 8px; color: var(--color-ink);">
+                            ${item.type === 'ask' ? item.data.question.substring(0, 50) + '...' :
+                              item.type === 'mood' ? item.data.mood :
+                              item.type === 'lot' ? item.data.theme + '签' :
+                              item.type === 'dream' ? item.data.content.substring(0, 50) + '...' :
+                              item.data.theme}
+                        </p>
+                        <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px; margin-top: 8px;" onclick="deleteCollection(${index})">删除</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteCollection(index) {
+            const collection = JSON.parse(localStorage.getItem('jinshulai_collection') || '[]');
+            collection.splice(index, 1);
+            localStorage.setItem('jinshulai_collection', JSON.stringify(collection));
+            renderCollection();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('jinshulai_history') || '[]');
+            const list = document.getElementById('history-list');
+            if (history.length === 0) {
+                list.innerHTML = `<p style="text-align: center; color: var(--color-bamboo); padding: 20px;">暂无浏览记录</p>`;
+                return;
+            }
+            list.innerHTML = history.slice(-10).reverse().map(item => {
+                const icons = { ask: '📜', mood: '💭', lot: '🎋', dream: '🌙', music: '🎵' };
+                const titles = { ask: '问古笺', mood: '记录心境', lot: '求签', dream: '解梦', music: '听音乐' };
+                return `
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(45, 90, 74, 0.1);">
+                        <span>${icons[item.type]} ${titles[item.type]}</span>
+                        <span style="font-size: 12px; color: var(--color-bamboo);">${item.date}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderQingtan() {
+            const list = document.getElementById('qingtan-list');
+            list.innerHTML = data.qingtan.map(item => `
+                <div class="card" style="cursor: pointer;" onclick="alert('${item.content}')">
+                    <h4 style="font-size: 16px; color: var(--color-moss); margin-bottom: 8px;">${item.title}</h4>
+                    <p style="font-size: 14px; color: var(--color-bamboo); line-height: 1.6;">${item.content.substring(0, 80)}...</p>
+                </div>
+            `).join('');
+        }
+
+        function shareCard() {
+            alert('锦书已生成，可截图分享给好友！');
+        }
+
+        function init() {
+            renderQingtan();
+            renderCalendar();
+            loadUserInfo();
+            renderCollection();
+            renderHistory();
+            document.getElementById('user-books').innerHTML = data.classics.slice(0, 4).map(b => `<span class="tag">${b.name}</span>`).join('');
+            document.getElementById('user-instruments').innerHTML = ['古筝', '古琴', '笛子', '箫'].map(i => `<span class="tag">${i}</span>`).join('');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
