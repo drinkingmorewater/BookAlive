@@ -1,11 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": ".",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/",
       "destination": "/jinshulai.html"
     },
     {
-      "source": "/:path*",
+      "source": "/((?!.*\\.).*)",
       "destination": "/jinshulai.html"
     }
   ]
