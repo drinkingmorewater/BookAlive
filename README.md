@@ -4,16 +4,6 @@
 
 ---
 
-## 🎬 产品介绍视频
-
-https://github.com/user-attachments/assets/72439ad7-e0e2-47ba-be96-7794ba36ca2e
-
-> 📺 **高清版备用链接**：[点击访问 Google Drive 高清视频](https://drive.google.com/file/d/1StpZOBG_yWj8lwW8WavGVVH7a0JrgVsB/view?usp=sharing)
-> 
-> 💡 若上方视频无法播放，可前往 [GitHub Issue #1](https://github.com/drinkingmorewater/BookAlive/issues/1) 直接观看，或使用 Google Drive 高清备用链接。
-
----
-
 ## ✨ 这是什么神仙产品？
 
 你有没有过这种时刻——
@@ -31,6 +21,14 @@ https://github.com/user-attachments/assets/72439ad7-e0e2-47ba-be96-7794ba36ca2e
 直接观看：https://github.com/drinkingmorewater/BookAlive/issues/1
 
 ---
+
+## 🎬 产品介绍视频
+
+https://github.com/user-attachments/assets/72439ad7-e0e2-47ba-be96-7794ba36ca2e
+
+> 📺 **高清版备用链接**：[点击访问 Google Drive 高清视频](https://drive.google.com/file/d/1StpZOBG_yWj8lwW8WavGVVH7a0JrgVsB/view?usp=sharing)
+> 
+> 💡 若上方视频无法播放，可前往 [GitHub Issue #1](https://github.com/drinkingmorewater/BookAlive/issues/1) 直接观看，或使用 Google Drive 高清备用链接。
 
 ## 🎯 市场定位：传统文化界的「斜杠青年」
 
