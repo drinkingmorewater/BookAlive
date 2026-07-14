@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/jinshulai.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/jinshulai.html"
+    }
+  ]
+}
